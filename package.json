@@ -1,0 +1,30 @@
+{
+  "name": "taylortom-cli",
+  "version": "0.0.1",
+  "description": "Command line utility for use with taylortom.co.uk. ",
+  "preferGlobal": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/taylortom/taylortom-cli"
+  },
+  "keywords": [
+    "taylortom"
+  ],
+  "author": "Thomas Taylor <me@taylortom.co.uk> (http://taylortom.co.uk/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/taylortom/taylortom-cli/issues"
+  },
+  "homepage": "https://github.com/taylortom/taylortom-cli",
+  "bin": {
+    "taylortom": "index.js"
+  },
+  "dependencies": {
+    "handlebars": "^3.0.3",
+    "marked": "^0.3.5",
+    "nodegit": "^0.4.1",
+    "path": "^0.11.14",
+    "q": "^1.4.1",
+    "underscore": "^1.8.3"
+  }
+}
