@@ -1,8 +1,8 @@
 {
     "name": "taylortom",
     "repos": {
-        "blog": "git@github.com:taylortom/blog-posts.git",
-        "website": "git@github.com:taylortom/taylortom.github.io.git"
+        "posts": "git@github.com:taylortom/blog-posts.git",
+        "site": "git@github.com:taylortom/taylortom.github.io.git"
     },
     "pages": {
         "home": {
@@ -12,8 +12,14 @@
         },
         "blog": {
             "title": "Blog",
+            "description": "You've stumbled across my blog: the home of my most private, innermost thoughts and reflections. And random cat videos.",
+            "description": "Welcome to my blog,<br/>I write about many things<br/>Like cat videos.<br/><br/>",
             "template": "blog.hbs",
-            "subDir": true
+            "subDir": true,
+            "pageSize": 2
         }
+    },
+    "testing": {
+        "serverPort": 8000
     }
 }

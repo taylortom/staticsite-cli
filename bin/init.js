@@ -6,7 +6,7 @@ var nodegit = require("nodegit");
 var path = require("path");
 var Q = require("q");
 
-var config = require("../config/config.json");
+var config = require("../js/config.js");
 
 /*
 * Downloads the repos
@@ -14,10 +14,10 @@ var config = require("../config/config.json");
 module.exports = function init(options) {
     log("initialising website...");
 
-    var TEMP_DIR = path.join(path.dirname(require.main.filename), "tmp");
+    // TODO bootstrapper
 
     async.eachSeries(Object.keys(config.repos), function iterator(repo, callback) {
-        fs.exists(path.join(TEMP_DIR, repo), function(exists) {
+        fs.exists(path.join(config._TEMP_DIR, repo), function(exists) {
             if(!exists) {
                 log("Cloning", repo);
                 getRepo(repo).then(function() {
@@ -25,7 +25,10 @@ module.exports = function init(options) {
                     callback();
                 }).catch(log);
             }
-            else callback();
+            else {
+                // TODO update git repo
+                callback();
+            }
         });
     }, function done() {
         log("website initialised.");
@@ -36,7 +39,7 @@ module.exports = function init(options) {
 
         if(!config.repos[name]) deferred.reject(new Error("No config options for '" + name + "'"));
 
-        nodegit.Clone(config.repos[name], path.join(TEMP_DIR, name), /* options */{
+        nodegit.Clone(config.repos[name], path.join(config._TEMP_DIR, name), /* options */{
             remoteCallbacks: {
                 certificateCheck: function() { return 1; },
                 credentials: function(url, userName) { return nodegit.Cred.sshKeyFromAgent(userName); }
