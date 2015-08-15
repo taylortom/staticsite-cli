@@ -16,7 +16,10 @@
             "description": "Welcome to my blog,<br/>I write about many things<br/>Like cat videos.<br/><br/>",
             "template": "blog.hbs",
             "subDir": true,
-            "pageSize": 2
+            "paginate": {
+                "pageSize": 10,
+                "pagedAttr": "posts"
+            }
         }
     },
     "testing": {
