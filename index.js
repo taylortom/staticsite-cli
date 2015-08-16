@@ -17,10 +17,11 @@ function initTempVars() {
     config._CLI_ROOT = path.dirname(require.main.filename);
     config._TEMP_DIR = path.join(config._CLI_ROOT, "tmp");
     config._OUTPUT_DIR = path.join(config._TEMP_DIR, "site");
-    config._PAGES_DIR = path.join(config._TEMP_DIR, "pages");
-    config._POSTS_DIR = path.join(config._TEMP_DIR, "blog", "posts");
-    config._POST_ASSETS_DIR = path.join(config._TEMP_DIR, "blog", "media");
-    config._TEMPLATES_DIR = path.join(config._TEMP_DIR, "templates");
+    config._SRC_DIR = path.join(config._TEMP_DIR, "src");
+    config._PAGES_DIR = path.join(config._SRC_DIR, "_pages");
+    config._POSTS_DIR = path.join(config._SRC_DIR, "_posts");
+    config._TEMPLATES_DIR = path.join(config._SRC_DIR, "_templates");
+    config._POST_ASSETS_DIR = path.join(config._SRC_DIR, "assets");
 };
 
 function processCommand() {
