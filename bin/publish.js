@@ -1,9 +1,9 @@
 var async = require("async");
 var logger = require("../js/logger");
 
-var build = require("../js/build.js");
-var save = require("../js/save.js");
-var upload = require("../js/upload.js");
+var build = require("../js/build");
+var save = require("../js/save");
+var upload = require("../js/upload");
 
 /*
 * Combines: build, save, upload

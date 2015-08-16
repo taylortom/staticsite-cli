@@ -8,7 +8,7 @@ var utils = require("../js/utils");
 var config = require("../js/config");
 
 /*
-* Creates an empty post file
+* Creates an empty post file, opens in editor
 */
 module.exports = function post(options) {
     logger.command('Creating new post.');

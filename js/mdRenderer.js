@@ -3,6 +3,9 @@ var path = require("path");
 
 var config = require("./config");
 
+/*
+* Takes markdown-formatted data, and converts to an HTML string.
+*/
 var exports = module.exports = function render(text) {
     // custom replacements
     for(var key in replacements)

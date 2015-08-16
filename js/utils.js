@@ -1,6 +1,9 @@
 var logger = require("./logger");
 var moment = require("moment");
 
+/*
+* various helper functions
+*/
 var exports = module.exports = {};
 
 exports.formatDate = function(date,format) {

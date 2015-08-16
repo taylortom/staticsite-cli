@@ -4,7 +4,7 @@ var fs = require("fs");
 var logger = require("./js/logger");
 var path = require("path");
 
-var config = require("./js/config.js");
+var config = require("./js/config");
 
 // self-starter
 (function start() {

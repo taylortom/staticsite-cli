@@ -7,7 +7,7 @@ var mdRenderer = require("./mdRenderer");
 var path = require("path");
 var utils = require("./utils");
 
-var config = require("../js/config.js");
+var config = require("./config");
 
 var pageTemplate;
 

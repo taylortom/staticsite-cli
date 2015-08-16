@@ -6,7 +6,7 @@ var nodegit = require("nodegit");
 var path = require("path");
 var Q = require("q");
 
-var config = require("../js/config.js");
+var config = require("../js/config");
 
 /*
 * Downloads the repos
