@@ -4,8 +4,6 @@ var path = require("path");
 
 var config = require("./config");
 
-// TODO also allow file path
-
 var exports = module.exports = function render(text) {
     // custom replacements
     for(var key in replacements)
@@ -23,7 +21,6 @@ var replacements = {
 
 /**
 * Marked renderer overrides
-* TODO: add these to templates?
 */
 var renderer = new marked.Renderer();
 
@@ -31,7 +28,6 @@ renderer.heading = function(text, level) {
     return '<div class="heading h' + level + '">' + text + '</div>';
 };
 
-// TODO add a highlighter
 renderer.code = function(value) {
     return '<div class="source_code" style="white-space: pre-wrap;">' + value + '</div>';
 };
@@ -55,7 +51,7 @@ renderer.html = function(value) {
     //TODO allow for ' or "?
     switch(name) {
         case "youtube":
-            return "<iframe class='media' width='480' height='320' src='https://www.youtube.com/embed/" + value.match(/video-id="(.*)"/)[1] + "?rel=0&amp;showinfo=0' allowfullscreen></iframe>";
+            return "<div class='youtubeWrapper'><iframe class='media' src='https://www.youtube.com/embed/" + value.match(/video-id="(.*)"/)[1] + "?rel=0&amp;showinfo=0' allowfullscreen></iframe></div>";
         case "icon":
             return "<span class='icon-" + value.match(/name="(.*)"/)[1] + "' style='display:inline;'></span>";
         default:

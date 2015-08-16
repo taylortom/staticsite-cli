@@ -14,20 +14,18 @@ var config = require("../js/config.js");
 module.exports = function init(options) {
     log("initialising website...");
 
-    // TODO bootstrapper
-
-    async.eachSeries(Object.keys(config.repos), function iterator(repo, callback) {
-        fs.exists(path.join(config._TEMP_DIR, repo), function(exists) {
+    async.eachSeries(Object.keys(config.repos), function iterator(repo, cbDoneLoop) {
+        fs.exists(path.join(config._TEMP_DIR, repo), function gotExists(exists) {
             if(!exists) {
                 log("Cloning", repo);
                 getRepo(repo).then(function() {
                     log("Clone successful!");
-                    callback();
+                    cbDoneLoop();
                 }).catch(log);
             }
             else {
                 // TODO update git repo
-                callback();
+                cbDoneLoop();
             }
         });
     }, function done() {
@@ -39,7 +37,7 @@ module.exports = function init(options) {
 
         if(!config.repos[name]) deferred.reject(new Error("No config options for '" + name + "'"));
 
-        nodegit.Clone(config.repos[name], path.join(config._TEMP_DIR, name), /* options */{
+        nodegit.Clone(config.repos[name], path.join(config._TEMP_DIR, name),{
             remoteCallbacks: {
                 certificateCheck: function() { return 1; },
                 credentials: function(url, userName) { return nodegit.Cred.sshKeyFromAgent(userName); }
