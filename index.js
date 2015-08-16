@@ -1,13 +1,14 @@
 #! /usr/bin/env node
 var _ = require("underscore");
 var fs = require("fs");
-var log = require("./js/logger");
+var logger = require("./js/logger");
 var path = require("path");
 
 var config = require("./js/config.js");
 
 // self-starter
 (function start() {
+    logger.welcome();
     initTempVars();
     processCommand();
 })();
@@ -28,7 +29,7 @@ function processCommand() {
     var commandDir = path.join(config._CLI_ROOT, "bin", command + ".js");
 
     fs.stat(commandDir, function(error, results) {
-        if(error) return log(new Error("invalid command '" + command + "'"));
+        if(error) return logger.error("Invalid command " + logger.var(command));
 
         var options = getArguments();
         var commandHandler = require(commandDir)(options);
@@ -42,6 +43,6 @@ function getArguments() {
 function isValidOption(argument) {
     if(argument.indexOf("--") === 0) return true;
 
-    log("Warning, failed to parse option: '" + argument + "'");
+    logger.warn("Failed to parse option: '" + argument + "'");
     return false;
 };

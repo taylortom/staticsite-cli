@@ -1,7 +1,7 @@
 var async = require("async");
 var fs = require("fs");
 var ftp = require("ftp");
-var log = require("./logger");
+var logger = require("./logger");
 var path = require("path");
 
 /*
@@ -22,7 +22,8 @@ module.exports = function upload(cbUploaded) {
     client.on('error', handleError);
 
     client.on('ready', function connReady() {
-        log('connected.');
+        logger.info('Connected to server as ' + logger.var(ftpConfig.host) + " as " + logger.var(ftpConfig.user));
+        logger.task('Uploading files to server');
         cleanRemote(function cleaned(error) {
             if(error) return handleError(error);
 
@@ -37,7 +38,6 @@ module.exports = function upload(cbUploaded) {
     // self starting
     (function start() {
         client.connect(ftpConfig);
-        log('connecting to ' + ftpConfig.host + " as " + ftpConfig.user);
     })();
 
     function handleError(error) {
@@ -86,7 +86,7 @@ module.exports = function upload(cbUploaded) {
         var localDir = file.replace(config._OUTPUT_DIR, "").slice(1);
         client.put(file, config.server.base + "/" + localDir, function(error) {
             if(error) return handleError(error);
-            console.log("   uploaded " + localDir);
+            logger.debug("Uploaded " + logger.file(localDir));
             cbDoneUpload();
         });
     }

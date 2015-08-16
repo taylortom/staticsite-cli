@@ -1,7 +1,7 @@
 var _ = require("underscore");
 var async = require("async");
 var fs = require("fs");
-var log = require("../js/logger");
+var logger = require("../js/logger");
 var nodegit = require("nodegit");
 var path = require("path");
 var Q = require("q");
@@ -12,16 +12,16 @@ var config = require("../js/config.js");
 * Downloads the repos
 */
 module.exports = function init(options) {
-    log("initialising website...");
+    logger.command("Initialising website");
 
     async.eachSeries(Object.keys(config.repos), function iterator(repo, cbDoneLoop) {
         fs.exists(path.join(config._TEMP_DIR, repo), function gotExists(exists) {
             if(!exists) {
-                log("Cloning", repo);
+                logger.debug("Cloning", logger.file(repo));
                 getRepo(repo).then(function() {
-                    log("Clone successful!");
+                    logger.info("Clone successful");
                     cbDoneLoop();
-                }).catch(log);
+                }).catch(logger.error);
             }
             else {
                 // TODO update git repo
@@ -29,7 +29,7 @@ module.exports = function init(options) {
             }
         });
     }, function done() {
-        log("website initialised.");
+        logger.done("website initialised");
     });
 
     function getRepo(name) {

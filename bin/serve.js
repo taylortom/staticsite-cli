@@ -1,7 +1,7 @@
 var finalhandler = require('finalhandler');
 var http = require("http");
 var open = require("open");
-var log = require("../js/logger");
+var logger = require("../js/logger");
 var path = require("path");
 var serveStatic = require('serve-static');
 
@@ -20,7 +20,7 @@ module.exports = function serve(options) {
     });
 
     server.listen(config.testing.serverPort);
-    log("Running localhost at " + config._OUTPUT_DIR.replace(config._CLI_ROOT, "") + ":" + config.testing.serverPort);
+    logger.done("Running localhost at " + logger.var(config._OUTPUT_DIR.replace(config._CLI_ROOT, "") + ":" + config.testing.serverPort));
 
     open("http://localhost:" + config.testing.serverPort);
 };

@@ -1,5 +1,5 @@
 var exec = require('child_process').exec;
-var log = require("../js/logger");
+var logger = require("../js/logger");
 var fs = require("fs");
 var path = require("path");
 var prompt = require("prompt");
@@ -11,8 +11,9 @@ var config = require("../js/config");
 * Creates an empty post file
 */
 module.exports = function post(options) {
+    logger.command('Creating new post.');
     getMetadata(function gotMeta(error, meta) {
-        console.log(meta);
+        logger.log(meta);
     });
 };
 
@@ -32,7 +33,7 @@ function getMetadata(cbGotMeta) {
 
             exec("atom " + newPostPath, function executed(error, stdout, stderr) {
                 if(error) return cbGotMeta(error);
-                if(stdout) log(stdout);
+                if(stdout) logger.log(stdout);
                 if(stderr) return cbGotMeta(stderr);
             });
         });

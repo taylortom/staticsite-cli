@@ -1,4 +1,3 @@
-var log = require("./logger");
 var marked = require("marked");
 var path = require("path");
 

@@ -2,7 +2,7 @@ var _ = require("underscore");
 var async = require("async");
 var fs = require("fs.extra");
 var handlebars = require("handlebars");
-var log = require("./logger");
+var logger = require("./logger");
 var mdRenderer = require("./mdRenderer");
 var path = require("path");
 var utils = require("./utils");
@@ -15,6 +15,7 @@ var pageTemplate;
 * Generates the site files, and saves locally
 */
 module.exports = function build(cbBuilt) {
+    logger.task("Building files");
     async.series([
         cacheTemplate,
         cleanOutput,
@@ -109,7 +110,10 @@ function writePage(pageNo, pageData, cbPageWritten) {
     // make all dirs
     fs.mkdirp(path.join(outputDir, pageDir), function onMkdir(error) {
         if (error) return cbPageWritten(error);
-        fs.writeFile(path.join(outputDir, pageDir, "index.html"), html, cbPageWritten);
+        fs.writeFile(path.join(outputDir, pageDir, "index.html"), html, function(error) {
+            if(!error) logger.debug("Created " + logger.file(path.join(nameDir, pageDir, "/index.html")));
+            cbPageWritten(error);
+        });
     });
 };
 
@@ -171,7 +175,7 @@ function getBlogPosts(name, cbGotPosts) {
 
                     posts.push(postData);
                 } catch(e) {
-                    console.log("WARNING: skipping " + file + ", invalid metadata");
+                    logger.warn("Skipping " + logger.file(file) + ", invalid metadata");
                 }
 
                 cbDoneLoop();
@@ -194,7 +198,7 @@ function getBlogPosts(name, cbGotPosts) {
 * handlebars helpers
 */
 handlebars.registerHelper("log", function(value) {
-    log(value);
+    logger.log(value);
 });
 
 handlebars.registerHelper("dateFormat", function(value) {
