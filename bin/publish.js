@@ -10,7 +10,10 @@ var utils = require("../js/utils");
 var config = require("../js/config.js");
 
 /*
-* Updates the website on GitHub
+* Combines the following:
+* TODO build: create pages
+* TODO save: push to git
+* TODO output: FTP to web server
 */
 module.exports = function publish(options) {
     log("publishing website...");
@@ -50,7 +53,7 @@ module.exports = function publish(options) {
                         // set the page no
                         modelData.page = pageNo;
 
-                        var template = handlebars.compile(pageTemplate.replace("{{{pageContent}}}", hbsData));
+                        var template = handlebars.compile(pageTemplate.replace("[PAGE_CONTENT]", hbsData));
                         var html = template(modelData);
 
                         // work out the output path
@@ -90,10 +93,9 @@ module.exports = function publish(options) {
     function getModel(name, callback) {
         var model = {};
 
-        // give access to all page config settings in case
-        for(var key in config.pages[name]) {
-            model[key] = config.pages[name][key];
-        }
+        // give access to extra settings from config.json (globals and pages)
+        for(var key in config.globals) model[key] = config.globals[key];
+        for(var key in config.pages[name]) model[key] = config.pages[name][key];
 
         // common data
         model.id = name;

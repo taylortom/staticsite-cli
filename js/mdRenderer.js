@@ -9,7 +9,7 @@ var exports = module.exports = function render(text) {
 
 /**
 * Marked renderer overrides
-* TODO: add these to templates
+* TODO: add these to templates?
 */
 var renderer = new marked.Renderer();
 
@@ -38,7 +38,6 @@ renderer.image = function(href, title, alt) {
 renderer.html = function(value) {
     if(!value) return;
     var name = value.match(/<(.*?)\s/)[1];
-    console.log(name);
     //TODO allow for ' or "?
     switch(name) {
         case "youtube":

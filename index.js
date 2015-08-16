@@ -8,6 +8,7 @@ var config = require("./js/config.js");
 
 // self-starter
 (function start() {
+    // TODO check for git updates
     initTempVars();
     processCommand();
 })();

@@ -20,7 +20,7 @@ module.exports = function serve(options) {
     });
 
     server.listen(config.testing.serverPort);
-    log("Running local server at " + config._OUTPUT_DIR + ":" + config.testing.serverPort);
+    log("Running localhost at " + config._OUTPUT_DIR.replace(config._CLI_ROOT, "") + ":" + config.testing.serverPort);
 
     open("http://localhost:" + config.testing.serverPort);
 };
