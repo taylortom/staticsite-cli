@@ -10,12 +10,13 @@ var upload = require("../js/upload.js");
 */
 module.exports = function publish(options) {
     log("publishing...");
-    build(function(error) {
+    build(function built(error) {
         async.parallel([
             save,
             upload
-        ], function(error) {
-            log("site published!");
+        ], function doneAll(error) {
+            if(error) log(error);
+            else log("site published!");
         });
     });
 };
