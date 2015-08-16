@@ -1,11 +1,22 @@
 var log = require("./logger");
 var marked = require("marked");
 
+var config = require("./config");
+
 // TODO also allow file path
 
 var exports = module.exports = function render(text) {
+    // custom replacements
+    for(var i = 0, len = replacements.length; i < len; i++)
+        text = text.replace(replacements[i][0], replacements[i][1]);
+
     return marked(text, { renderer: renderer });
 };
+
+// replacement expected to be [regexp | substr, replacement]
+var replacements = [
+    ["[ASSETS_DIR]", config.globals.assetsDir]
+];
 
 /**
 * Marked renderer overrides

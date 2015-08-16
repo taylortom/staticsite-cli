@@ -4,6 +4,9 @@
         "posts": "git@github.com:taylortom/blog-posts.git",
         "site": "git@github.com:taylortom/taylortom.github.io.git"
     },
+    "globals": {
+        "assetsDir": "/assets"
+    },
     "pages": {
         "home": {
             "title": "Home",
