@@ -8,7 +8,7 @@ var serveStatic = require('serve-static');
 var config = require("../js/config");
 
 /*
-* Run local server, and opens in browser
+* Runs local server, and opens in browser
 */
 module.exports = function serve(options) {
     var serve = serveStatic(config._OUTPUT_DIR);

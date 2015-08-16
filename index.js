@@ -29,7 +29,11 @@ function processCommand() {
     var commandDir = path.join(config._CLI_ROOT, "bin", command + ".js");
 
     fs.stat(commandDir, function(error, results) {
-        if(error) return logger.error("Invalid command " + logger.var(command));
+        if(error) {
+            logger.error("Invalid command " + logger.var(command));
+            logger.listCommands();
+            return;
+        }
 
         var options = getArguments();
         var commandHandler = require(commandDir)(options);
