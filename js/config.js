@@ -7,5 +7,6 @@ for(var key in configJSON) {
 
 /*
 * Global configuration object, builds on the config.json
+* TODO move config.json to src
 */
 module.exports = config;

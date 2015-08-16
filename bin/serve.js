@@ -11,16 +11,14 @@ var config = require("../js/config");
 * Runs local server, and opens in browser
 */
 module.exports = function serve(options) {
+    // set up local server
     var serve = serveStatic(config._OUTPUT_DIR);
-
-    var server = http.createServer(function(req, res) {
-
+    var server = http.createServer(function serverReady(req, res) {
         var done = finalhandler(req, res);
         serve(req, res, done);
     });
-
     server.listen(config.testing.serverPort);
+    // open in browser
     logger.done("Running localhost at " + logger.var(config._OUTPUT_DIR.replace(config._CLI_ROOT, "") + ":" + config.testing.serverPort));
-
     open("http://localhost:" + config.testing.serverPort);
 };

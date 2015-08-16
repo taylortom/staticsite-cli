@@ -72,14 +72,20 @@ function writePages(cbPagesWritten) {
                 async.each(pagedAttr, function iterator(item, cbDoneLoop2) {
                     if(item.page !== currPage) {
                         currPage = item.page;
-                        writePage(currPage, pageData, cbDoneLoop2);
+                        writePage(currPage, pageData, function(error) {
+                            if(error) return cbPageWritten(error);
+                            cbDoneLoop2();
+                        });
                     } else {
                         // already written this page, so do nothing
                         cbDoneLoop2();
                     }
                 }, cbDoneLoop);
             } else {
-                writePage(1, pageData, cbDoneLoop);
+                writePage(1, pageData, function(error) {
+                    if(error) return cbPagesWritten(error);
+                    cbDoneLoop();
+                });
             }
         });
     }, cbPagesWritten);
@@ -110,8 +116,8 @@ function writePage(pageNo, pageData, cbPageWritten) {
     // make all dirs
     fs.mkdirp(path.join(outputDir, pageDir), function onMkdir(error) {
         if (error) return cbPageWritten(error);
-        fs.writeFile(path.join(outputDir, pageDir, "index.html"), html, function(error) {
-            if(!error) logger.debug("Created " + logger.file(path.join(nameDir, pageDir, "/index.html")));
+        fs.writeFile(path.join(outputDir, pageDir, pageData.modelData.index || "index.html"), html, function(error) {
+            if(!error) logger.debug("Created " + logger.file(path.join(nameDir, pageDir, pageData.modelData.index || "index.html")));
             cbPageWritten(error);
         });
     });

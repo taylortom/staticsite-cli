@@ -12,5 +12,7 @@ module.exports = function test(options) {
     async.series([
         build,
         serve
-    ]);
+    ], function(error) {
+        if(error) logger.error(error);
+    });
 };

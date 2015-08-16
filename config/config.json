@@ -9,7 +9,7 @@
     "pages": {
         "home": {
             "title": "Home",
-            "template": "home.hbs",
+            "template": "page.hbs",
             "subDir": false
         },
         "blog": {
