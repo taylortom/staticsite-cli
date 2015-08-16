@@ -1,5 +1,6 @@
 var log = require("./logger");
 var marked = require("marked");
+var path = require("path");
 
 var config = require("./config");
 
@@ -7,16 +8,18 @@ var config = require("./config");
 
 var exports = module.exports = function render(text) {
     // custom replacements
-    for(var i = 0, len = replacements.length; i < len; i++)
-        text = text.replace(replacements[i][0], replacements[i][1]);
+    for(var key in replacements)
+        text = text.replace(replacements[key].match, replacements[key].replace);
 
     return marked(text, { renderer: renderer });
 };
 
-// replacement expected to be [regexp | substr, replacement]
-var replacements = [
-    ["[ASSETS_DIR]", config.globals.assetsDir]
-];
+var replacements = {
+    localFile: {
+        match: "file://",
+        replace: config.globals.assetsDir + path.sep
+    }
+};
 
 /**
 * Marked renderer overrides
@@ -42,7 +45,7 @@ renderer.blockquote = function(value) {
 };
 
 renderer.image = function(href, title, alt) {
-    return "<img class='media' title='" + title + "' alt='" + alt + "' src='" + href.replace("file://", "media/") + "' />";
+    return "<img class='media' title='" + title + "' alt='" + alt + "' src='" + href.replace(replacements.localFile.match, replacements.localFile.replace) + "' />";
 };
 
 // TODO this is only block-level
