@@ -55,7 +55,7 @@ renderer.html = function(value) {
     //TODO allow for ' or "?
     switch(name) {
         case "youtube":
-            return "<iframe class='media' width='480' height='320' src='https://www.youtube.com/embed/" + value.match(/video-id="(.*)"/)[1] + "?rel=0&amp;showinfo=0' allowfullscreen></iframe>";
+            return "<div class='youtubeWrapper'><iframe class='media' src='https://www.youtube.com/embed/" + value.match(/video-id="(.*)"/)[1] + "?rel=0&amp;showinfo=0' allowfullscreen></iframe></div>";
         case "icon":
             return "<span class='icon-" + value.match(/name="(.*)"/)[1] + "' style='display:inline;'></span>";
         default:
