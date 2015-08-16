@@ -161,14 +161,19 @@ function getBlogPosts(name, cbGotPosts) {
 
                 var postData = {};
                 // store metadata
-                var metaReg = /(\[!META(\{.*\})\])/;;
-                var metaData = JSON.parse(mdData.match(metaReg)[2]);
-                for(var key in metaData) postData[key] = metaData[key];
-                // format data
-                if(metaData.published) metaData.published = new Date(metaData.published);
-                postData.body = mdRenderer(mdData.replace(metaReg, ""));
+                var metaReg = /(\[!META(\{.*\})\])/;
+                try {
+                    var metaData = JSON.parse(mdData.match(metaReg)[2]);
+                    for(var key in metaData) postData[key] = metaData[key];
+                    // format data
+                    if(metaData.published) metaData.published = new Date(metaData.published);
+                    postData.body = mdRenderer(mdData.replace(metaReg, ""));
 
-                posts.push(postData);
+                    posts.push(postData);
+                } catch(e) {
+                    console.log("WARNING: skipping " + file + ", invalid metadata");
+                }
+
                 cbDoneLoop();
             });
         }, function doneLoop() {
