@@ -199,7 +199,12 @@ module.exports = function publish(options) {
         if(value) return value.toLowerCase();
     });
 
-    handlebars.registerHelper("newPageLink", function(value) {
+    handlebars.registerHelper("newerPageLink", function(value) {
+        var no = value-1;
+        return "/blog" + (no == 1 ? "" : "/page" + no);
+    });
+
+    handlebars.registerHelper("olderPageLink", function(value) {
         return "/blog/page" + (++value);
     });
 
