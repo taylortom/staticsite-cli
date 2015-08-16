@@ -44,9 +44,15 @@ function copyFiles(cbCopiedFiles) {
     fs.readdir(config._SRC_DIR, function read(error, files) {
         if(error) return cbCopiedFiles(error);
         async.each(files, function iterator(file, cbDoneLoop) {
-            if(file[0] !== '.' && file[0] !== '_') {
+            var isDir = fs.statSync(path.join(config._SRC_DIR, file)).isDirectory();
+            if(isDir && file[0] !== '_') {
                 fs.copyRecursive(path.join(config._SRC_DIR, file), path.join(config._OUTPUT_DIR, file), cbDoneLoop);
-            } else cbDoneLoop();
+            } else if(file === "_root") {
+                // TODO remove this dirty, dirty code
+                fs.copyRecursive(path.join(config._SRC_DIR, file), path.join(config._OUTPUT_DIR), cbDoneLoop);
+            } else  {
+                cbDoneLoop();
+            }
         }, cbCopiedFiles);
     });
 };
@@ -84,7 +90,6 @@ function getPageData(name, cbGotPageData) {
 
         getModel(name, function(error, modelData) {
             if(error) return cbGotPageData(error);
-
             cbGotPageData(null, { hbsData: hbsData, modelData: modelData });
         });
     });
