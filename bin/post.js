@@ -31,7 +31,8 @@ function getMetadata(cbGotMeta) {
         fs.writeFile(newPostPath, "[!META" + JSON.stringify(result) + "]\n\n", function written(error) {
             if(error) return cbGotMeta(error);
 
-            exec("atom " + newPostPath, function executed(error, stdout, stderr) {
+            exec(config.pages.blog.editor + " " + newPostPath, function executed(error, stdout, stderr) {
+                logger.done("Launching " + logger.var(config.pages.blog.editor));
                 if(error) return cbGotMeta(error);
                 if(stdout) logger.log(stdout);
                 if(stderr) return cbGotMeta(stderr);

@@ -1,5 +1,4 @@
 {
-    "name": "taylortom",
     "repos": {
         "posts": "git@github.com:taylortom/blog-posts.git",
         "site": "git@github.com:taylortom/taylortom.github.io.git"
@@ -22,9 +21,11 @@
             "paginate": {
                 "pageSize": 10,
                 "pagedAttr": "posts"
-            }
+            },
+            "editor": "atom"
         }
     },
+    "debug": true,
     "testing": {
         "serverPort": 8000
     }
