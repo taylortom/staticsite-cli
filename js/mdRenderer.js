@@ -1,3 +1,4 @@
+var hl = require("highlight.js").highlightAuto;
 var marked = require("marked");
 var path = require("path");
 
@@ -31,7 +32,7 @@ renderer.heading = function(text, level) {
 };
 
 renderer.code = function(value) {
-    return '<div class="source_code" style="white-space: pre-wrap;">' + value + '</div>';
+    return '<div class="source_code" style="white-space: pre-wrap;">' + hl(value).value + '</div>';
 };
 
 renderer.codespan = function(value) {
