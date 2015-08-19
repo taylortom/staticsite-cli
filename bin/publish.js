@@ -15,7 +15,7 @@ module.exports = function publish(options) {
             save,
             upload
         ], function doneAll(error) {
-            if(error) logger.log(error);
+            if(error) logger.error(error);
             else logger.done("Site published");
         });
     });
