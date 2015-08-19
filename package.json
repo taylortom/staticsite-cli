@@ -1,7 +1,7 @@
 {
   "name": "taylortom-cli",
   "version": "0.0.1",
-  "description": "The custom command line interface for taylortom.co.uk.",
+  "description": "Command line interface for taylortom.co.uk.",
   "preferGlobal": true,
   "repository": {
     "type": "git",
@@ -19,6 +19,45 @@
   "bin": {
     "tt": "index.js"
   },
+  "testing": {
+    "serverPort": 8000
+  },
+  "logging": {
+    "filter": "debug",
+    "logFilters": {
+        "debug": ["*"],
+        "normal": ["command","task","done","info","warn","error"],
+        "basic": ["command","done","warn","error"],
+        "none": []
+    },
+    "logTypes": {
+        "command": {
+            "prefix": ">>"
+        },
+        "task": {
+            "style": "underline"
+        },
+        "done": {
+            "prefix": ">>",
+            "style": "green"
+        },
+        "log": {},
+        "info": {
+            "style": "grey"
+        },
+        "debug": {
+            "prefix": "  "
+        },
+        "warn": {
+            "prefix": "!!",
+            "style": "yellow"
+        },
+        "error": {
+            "prefix": "!!",
+            "style": "red"
+        }
+    }
+  },
   "dependencies": {
     "async": "^1.4.2",
     "chalk": "^1.1.0",
@@ -34,6 +73,7 @@
     "path": "^0.11.14",
     "prompt": "^0.2.14",
     "q": "^1.4.1",
+    "querystring": "^0.2.0",
     "serve-static": "^1.10.0",
     "underscore": "^1.8.3"
   }

@@ -1,12 +1,34 @@
-var configJSON = require("../config/config.json");
-var config = {};
-
-for(var key in configJSON) {
-    config[key] = configJSON[key];
-}
+var logger = require("./logger");
+var path = require("path");
 
 /*
 * Global configuration object, builds on the config.json
-* TODO move config.json to src
 */
-module.exports = config;
+var config = module.exports = {};
+
+(function init() {
+    config._CLI_ROOT = path.dirname(require.main.filename);
+    config._TEMP_DIR = path.join(config._CLI_ROOT, "tmp");
+    config._OUTPUT_DIR = path.join(config._TEMP_DIR, "site");
+    config._SRC_DIR = path.join(config._TEMP_DIR, "src");
+    config._PAGES_DIR = path.join(config._SRC_DIR, "_pages");
+    config._POSTS_DIR = path.join(config._SRC_DIR, "_posts");
+    config._TEMPLATES_DIR = path.join(config._SRC_DIR, "_templates");
+    config._POST_ASSETS_DIR = path.join(config._SRC_DIR, "assets");
+
+    // load up the JSON files
+    addConfigFile("../package.json"); // CLI
+    addConfigFile(path.join(config._SRC_DIR, "_config.json")); // site
+})();
+
+function addConfigFile(filename) {
+    try {
+        var fileJSON = require(filename);
+        for(var key in fileJSON) {
+            if(!config[key]) config[key] = fileJSON[key];
+            else logger.warn("Duplicate properties found ' + key + ', cannot add to config");
+        }
+    } catch(e) {
+        logger.error(e);
+    }
+}
