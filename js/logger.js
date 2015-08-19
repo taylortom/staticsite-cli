@@ -1,5 +1,6 @@
 var chalk = require("chalk");
-var conf = require("./config").logging;
+
+var config = require("./config");
 
 /*
 * Various debugging shortcuts
@@ -17,18 +18,21 @@ exports.var     = function(value) { return '"' + value + '"'; };
 */
 // self-starter
 (function init() {
-    var logLevel = conf.filter;
-    var filter = conf.logFilters[logLevel] || conf.logFilters.normal;
-    for(var key in conf.logTypes) {
-        var enabled = filter.indexOf(key) !== -1;
-        exports[key] = (function(message) {
-            var prefix = (this.prefix && this.prefix + " ") || "";
-            var message = chalk[this.style] && chalk[this.style](message) || message;
-            var suffix = (this.suffix && " " + this.suffix) || "";
-            console.log(prefix + message + suffix);
-        }).bind(conf.logTypes[key]);
+    var logConf = config.logging;
+    var logLevel = logConf.filter;
+    var filter = logConf.logFilters[logLevel] || logConf.logFilters.normal;
+    for(var key in logConf.logTypes) {
+        if(filter[0] !== "*" && filter.indexOf(key) === -1) {
+            exports[key] = function() {};
+        } else {
+            exports[key] = (function(message) {
+                var prefix = (this.prefix && this.prefix) || "";
+                var message = chalk[this.style] && chalk[this.style](message) || message;
+                var suffix = this.suffix || "";
+                console.log(prefix + message + suffix);
+            }).bind(logConf.logTypes[key]);
+        }
     };
 
-    if(!conf.logFilters[logLevel]) exports.warn("debugging level '" + logLevel + "' not recognised, switching to 'normal'");
-    else exports.info("debugging level set to '" + logLevel + "'");
+    if(!logConf.logFilters[logLevel]) exports.warn("debugging level '" + logLevel + "' not recognised, switching to 'normal'");
 })();

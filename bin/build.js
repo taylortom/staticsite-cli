@@ -2,20 +2,20 @@ var _ = require("underscore");
 var async = require("async");
 var fs = require("fs.extra");
 var handlebars = require("handlebars");
-var logger = require("./logger");
-var mdRenderer = require("./mdRenderer");
+var mdRenderer = require("../js/mdRenderer");
 var path = require("path");
-var utils = require("./utils");
 
-var config = require("./config");
+var config = require("../js/config");
+var logger = require("../js/logger");
+var utils = require("../js/utils");
 
 var pageTemplate;
 
 /*
 * Generates the site files, and saves locally
 */
-module.exports = function build(cbBuilt) {
-    logger.task("Building files");
+module.exports = function build(args, cbBuilt) {
+    logger.task("Preparing output folder");
     async.series([
         cacheTemplate,
         cleanOutput,
@@ -28,6 +28,7 @@ module.exports = function build(cbBuilt) {
 function cacheTemplate(cbTemplateLoaded) {
     fs.readFile(path.join(config._TEMPLATES_DIR, "page.html"), "utf-8", function onRead(error, htmlContents) {
         if(error) return cbTemplateLoaded(error);
+        logger.debug("Cached template");
         pageTemplate = htmlContents;
         cbTemplateLoaded();
     });
@@ -36,31 +37,40 @@ function cacheTemplate(cbTemplateLoaded) {
 // delete everything in _OUTPUT_DIR
 function cleanOutput(cbCleaned) {
     fs.rmrf(config._OUTPUT_DIR, function removed(error) {
-        fs.mkdir(config._OUTPUT_DIR, cbCleaned);
+        fs.mkdir(config._OUTPUT_DIR, function(error) {
+            if(!error) logger.debug("Cleaned output directory");
+            cbCleaned();
+        });
     });
 };
 
 // copy files/folders in _SRC_DIR not prefixed with _
 function copyFiles(cbCopiedFiles) {
+    logger.task("Copying required files");
     fs.readdir(config._SRC_DIR, function read(error, files) {
         if(error) return cbCopiedFiles(error);
         async.each(files, function iterator(file, cbDoneLoop) {
             var isDir = fs.statSync(path.join(config._SRC_DIR, file)).isDirectory();
-            if(isDir && file[0] !== '_') {
-                fs.copyRecursive(path.join(config._SRC_DIR, file), path.join(config._OUTPUT_DIR, file), cbDoneLoop);
-            } else if(file === "_root") {
-                // TODO remove this dirty, dirty code
-                fs.copyRecursive(path.join(config._SRC_DIR, file), path.join(config._OUTPUT_DIR), cbDoneLoop);
+            if(isDir && file[0] !== '_' && file[0] !== '.') {
+                fs.copyRecursive(path.join(config._SRC_DIR, file), path.join(config._OUTPUT_DIR, file), function(error) {
+                    logger.debug("Copied " + file);
+                    return cbDoneLoop();
+                });
+            } else if(file === "_root") { // TODO remove this dirty, dirty check
+                fs.copyRecursive(path.join(config._SRC_DIR, file), path.join(config._OUTPUT_DIR), function(error) {
+                    logger.debug("Copied " + file);
+                    return cbDoneLoop();
+                });
             } else  {
-                cbDoneLoop();
+                return cbDoneLoop();
             }
         }, cbCopiedFiles);
     });
 };
 
 function writePages(cbPagesWritten) {
+    logger.task("Creating static pages");
     async.each(Object.keys(config.pages), function iterator(page, cbDoneLoop) {
-
         getPageData(page, function(error, pageData) {
             if(error) return cbDoneLoop(error);
 
@@ -82,7 +92,7 @@ function writePages(cbPagesWritten) {
                     }
                 }, cbDoneLoop);
             } else {
-                writePage(1, pageData, function(error) {
+                writePage(1, pageData, function pageWritten(error) {
                     if(error) return cbPagesWritten(error);
                     cbDoneLoop();
                 });

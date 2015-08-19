@@ -25,37 +25,49 @@
   "logging": {
     "filter": "debug",
     "logFilters": {
-        "debug": ["*"],
-        "normal": ["command","task","done","info","warn","error"],
-        "basic": ["command","done","warn","error"],
-        "none": []
+      "debug": [
+        "*"
+      ],
+      "normal": [
+        "command",
+        "task",
+        "done",
+        "info",
+        "warn",
+        "error"
+      ],
+      "basic": [
+        "command",
+        "done",
+        "warn",
+        "error"
+      ],
+      "none": []
     },
     "logTypes": {
-        "command": {
-            "prefix": ">>"
-        },
-        "task": {
-            "style": "underline"
-        },
-        "done": {
-            "prefix": ">>",
-            "style": "green"
-        },
-        "log": {},
-        "info": {
-            "style": "grey"
-        },
-        "debug": {
-            "prefix": "  "
-        },
-        "warn": {
-            "prefix": "!!",
-            "style": "yellow"
-        },
-        "error": {
-            "prefix": "!!",
-            "style": "red"
-        }
+      "command": {
+        "prefix": "\n>> ",
+        "style": "cyan"
+      },
+      "task": {
+        "prefix": "\n",
+        "style": "underline"
+      },
+      "info": {},
+      "done": {
+        "prefix": "\n>> ",
+        "suffix": ".\n",
+        "style": "green"
+      },
+      "debug": {},
+      "warn": {
+        "prefix": "!! ",
+        "style": "yellow"
+      },
+      "error": {
+        "prefix": "!! ",
+        "style": "red"
+      }
     }
   },
   "dependencies": {

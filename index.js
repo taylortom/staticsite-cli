@@ -1,40 +1,56 @@
 #! /usr/bin/env node
-var _ = require("underscore");
-var fs = require("fs");
-var logger = require("./js/logger");
+var chalk = require("chalk");
+var minimist = require("minimist");
 var path = require("path");
 
 var config = require("./js/config");
+var logger = require("./js/logger");
+
+var args = minimist(process.argv.slice(2));
+var commands = {
+    // core
+    "init    ": "Downloads the repos and readies the file system",
+    "build   ": "Creates the output for the site",
+    "launch  ": "launches the live site in the default browser",
+    "serve   ": "Runs site on a local server",
+    "post    ": "Writes a new post",
+    "upload  ": "Copies files to hosted server",
+    "save    ": "Stores the latest changes on git",
+    // compound
+    "test    ": "For offline testing: builds files, and calls serve",
+    "publish ": "Builds files, updates git, and uploads to FTP server"
+};
 
 // self-starter
 (function start() {
-    logger.welcome();
+    welcome();
     processCommand();
 })();
 
 function processCommand() {
-    var command = process.argv[2];
-    var commandDir = path.join(config._CLI_ROOT, "bin", command + ".js");
+    var command = args._[0];
 
-    fs.stat(commandDir, function(error, results) {
-        if(error) {
-            logger.error("Invalid command " + logger.var(command));
-            logger.listCommands();
-            return;
-        }
+    if(command === "list" || args.h || args.help) return listCommands();
 
-        var options = getArguments();
-        var commandHandler = require(commandDir)(options);
+    try {
+        console.log(path.join(config._CLI_ROOT, "bin", command));
+        var commandHandler = require(path.join(config._CLI_ROOT, "bin", command));
+    } catch(e) {
+        return logger.error("'" + command + "' is not a valid command. See 'tt list' for help.");
+    }
+
+    logger.command("Running " + command);
+    commandHandler(args, function finishedCommand(error, data) {
+        if(error) logger.error(error);
+        else logger.done("Finished " + command);
     });
-}
-
-function getArguments() {
-    return _.filter(process.argv.slice(3), isValidOption);
 };
 
-function isValidOption(argument) {
-    if(argument.indexOf("--") === 0) return true;
+function welcome() {
+    console.log(config.name + ": " + config.description + " (v" + config.version + ")");
+};
 
-    logger.warn("Failed to parse option: '" + argument + "'");
-    return false;
+function listCommands(options) {
+    console.log("\nThe available commands are:");
+    for(var key in commands) console.log("   " + chalk.gray(key) + "  " + commands[key]);
 };

@@ -1,14 +1,15 @@
 var async = require("async");
 var fs = require("fs");
 var ftp = require("ftp");
-var logger = require("./logger");
 var path = require("path");
+
+var config = require("../js/config");
+var logger = require("../js/logger");
 
 /*
 * Uploads the tmp/site files to the specified server via FTP
 */
-module.exports = function upload(cbUploaded) {
-    var config = require("./config");
+module.exports = function upload(args, cbUploaded) {
     var client = new ftp();
 
     // TODO encrypt these and store somewhere
@@ -16,45 +17,56 @@ module.exports = function upload(cbUploaded) {
         host: config.server.host,
         port: config.server.port,
         user: config.server.user,
-        password: config.server.password
+        password: config.server.password,
+        connTimeout: 5000
     };
 
-    client.on('error', handleError);
-
     client.on('ready', function connReady() {
-        logger.info('Connected to server as ' + logger.var(ftpConfig.host) + " as " + logger.var(ftpConfig.user));
-        logger.task('Uploading files to server');
+        logger.debug('Connected to server ' + logger.var(ftpConfig.host) + " as " + logger.var(ftpConfig.user));
         cleanRemote(function cleaned(error) {
-            if(error) return handleError(error);
-
-            uploadDir(config._OUTPUT_DIR, function(error) {
-                if(error) return handleError(error);
+            if(error) {
                 client.end();
-                cbUploaded();
+                return cbUploaded(error);
+            }
+            logger.task("Cleaning remote folder");
+
+            logger.task('Uploading files to server');
+            uploadDir(config._OUTPUT_DIR, function(error) {
+                client.end();
+                return cbUploaded(error);
             });
         });
     });
 
     // self starting
     (function start() {
+        logger.task('Connecting to server');
         client.connect(ftpConfig);
-    })();
-
-    function handleError(error) {
-        client.end();
-        cbUploaded(error);
-    };
+    })();;
 
     function cleanRemote(cbCleaned) {
         client.list(config.server.base, function gotList(error, files) {
             async.each(files, function iterator(file, cbDoneLoop) {
-                if(file.name[0] === ".") return cbDoneLoop();
-                else if(file.type === "d") client.rmdir(config.server.base + file.name, true, cbDoneLoop)
-                else client.delete(config.server.base + file.name, cbDoneLoop);
+                if(file.name[0] === ".") {
+                    return cbDoneLoop();
+                }
+                else if(file.type === "d") {
+                    client.rmdir(config.server.base + file.name, true, function(error) {
+                        if(error) cbCleaned(error);
+                        else cbDoneLoop();
+                    })
+                }
+                else {
+                    client.delete(config.server.base + file.name, function(error) {
+                        if(error) cbCleaned(error);
+                        else cbDoneLoop();
+                    });
+                }
             }, cbCleaned);
         });
     };
 
+    // TODO horrible nesting
     function uploadDir(dir, cbDoneUpload) {
         makeDir(dir, function madeDir(error) {
             if(error) return cbDoneUpload(error);
@@ -68,8 +80,18 @@ module.exports = function upload(cbUploaded) {
                     fs.stat(path.join(dir,file), function gotStats(error, stats) {
                         if(error) return cbDoneUpload(error);
 
-                        if(stats.isDirectory()) uploadDir(path.join(dir,file), cbDoneLoop);
-                        else uploadFile(path.join(dir,file), cbDoneLoop);
+                        if(stats.isDirectory()) {
+                            uploadDir(path.join(dir,file), function uploaded(error) {
+                                if(error) cbDoneUpload(error);
+                                cbDoneLoop();
+                            });
+                        }
+                        else {
+                            uploadFile(path.join(dir,file), function uploaded(error) {
+                                if(error) cbDoneUpload(error);
+                                cbDoneLoop();
+                            });
+                        }
                     });
                 }, cbDoneUpload);
             });
@@ -85,7 +107,7 @@ module.exports = function upload(cbUploaded) {
     function uploadFile(file, cbDoneUpload) {
         var localDir = file.replace(config._OUTPUT_DIR, "").slice(1);
         client.put(file, config.server.base + "/" + localDir, function(error) {
-            if(error) return handleError(error);
+            if(error) return cbDoneUpload(error);
             logger.debug("Uploaded " + logger.file(localDir));
             cbDoneUpload();
         });

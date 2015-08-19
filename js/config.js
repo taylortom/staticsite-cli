@@ -1,12 +1,11 @@
-var logger = require("./logger");
 var path = require("path");
 
 /*
-* Global configuration object, builds on the config.json
+* Global configuration object, builds on the package.json and _config.json
 */
 var config = module.exports = {};
 
-(function init() {
+(function init(){
     config._CLI_ROOT = path.dirname(require.main.filename);
     config._TEMP_DIR = path.join(config._CLI_ROOT, "tmp");
     config._OUTPUT_DIR = path.join(config._TEMP_DIR, "site");
@@ -26,9 +25,6 @@ function addConfigFile(filename) {
         var fileJSON = require(filename);
         for(var key in fileJSON) {
             if(!config[key]) config[key] = fileJSON[key];
-            else logger.warn("Duplicate properties found ' + key + ', cannot add to config");
         }
-    } catch(e) {
-        logger.error(e);
-    }
-}
+    } catch(e) { console.log("error: " + e); }
+};

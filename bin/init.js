@@ -1,25 +1,22 @@
-var _ = require("underscore");
 var async = require("async");
 var fs = require("fs");
-var logger = require("../js/logger");
 var nodegit = require("nodegit");
 var path = require("path");
 var Q = require("q");
 
 var config = require("../js/config");
+var logger = require("../js/logger");
 
 /*
 * Downloads the repos
 */
-module.exports = function init(options) {
-    logger.command("Initialising website");
-
+module.exports = function init(args) {
     async.eachSeries(Object.keys(config.repos), function iterator(repo, cbDoneLoop) {
         fs.exists(path.join(config._TEMP_DIR, repo), function gotExists(exists) {
             if(!exists) {
                 logger.debug("Cloning", logger.file(repo));
                 getRepo(repo).then(function() {
-                    logger.info("Clone successful");
+                    logger.debug("Clone successful");
                     cbDoneLoop();
                 }).catch(logger.error);
             }
