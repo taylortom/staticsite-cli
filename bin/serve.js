@@ -13,8 +13,7 @@ var logger = require("../js/logger");
 module.exports = function serve(args) {
     // set up local server
     var serve = serveStatic(config._OUTPUT_DIR);
-    var server = http.createServer(function serverReady(req, res) {
-        logger.debug("Server ready");
+    var server = http.createServer(function onRequest(req, res) {
         var done = finalhandler(req, res);
         serve(req, res, done);
     });
