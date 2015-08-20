@@ -9,27 +9,41 @@ var config = require("../js/config");
 var logger = require("../js/logger");
 var utils = require("../js/utils");
 
-var pageTemplate;
+var htmlTemplate;
+var pagesData = {};
+
+// TODO split this into separate files per page
 
 /*
 * Generates the site files, and saves locally
 */
+
+// prepare
+// build
+// save
 module.exports = function build(args, cbBuilt) {
-    logger.task("Preparing output folder");
+    logger.task("Preparing output");
     async.series([
+        getPagesData,
         cacheTemplate,
-        cleanOutput,
-        writePages,
-        copyFiles
-    ], cbBuilt);
+        cleanOutput
+    ], function(error) {
+        if(error) return cbBuilt(error);
+        logger.task("Building output");
+        async.parallel([
+            writePages,
+            writePosts,
+            copyFiles
+        ], cbBuilt);
+    });
 };
 
 // save main page template file
 function cacheTemplate(cbTemplateLoaded) {
-    fs.readFile(path.join(config._TEMPLATES_DIR, "page.html"), "utf-8", function onRead(error, htmlContents) {
+    loadTemplate("page.html", function onRead(error, htmlContents) {
         if(error) return cbTemplateLoaded(error);
-        logger.debug("Cached template");
-        pageTemplate = htmlContents;
+        logger.debug("Cached HTML template data");
+        htmlTemplate = htmlContents
         cbTemplateLoaded();
     });
 };
@@ -39,27 +53,28 @@ function cleanOutput(cbCleaned) {
     fs.rmrf(config._OUTPUT_DIR, function removed(error) {
         fs.mkdir(config._OUTPUT_DIR, function(error) {
             if(!error) logger.debug("Cleaned output directory");
-            cbCleaned();
+            cbCleaned(error);
         });
     });
 };
 
 // copy files/folders in _SRC_DIR not prefixed with _
 function copyFiles(cbCopiedFiles) {
-    logger.task("Copying required files");
     fs.readdir(config._SRC_DIR, function read(error, files) {
         if(error) return cbCopiedFiles(error);
         async.each(files, function iterator(file, cbDoneLoop) {
             var isDir = fs.statSync(path.join(config._SRC_DIR, file)).isDirectory();
             if(isDir && file[0] !== '_' && file[0] !== '.') {
                 fs.copyRecursive(path.join(config._SRC_DIR, file), path.join(config._OUTPUT_DIR, file), function(error) {
+                    if(error) return cbCopiedFiles(error);
                     logger.debug("Copied " + file);
-                    return cbDoneLoop();
+                    cbDoneLoop();
                 });
             } else if(file === "_root") { // TODO remove this dirty, dirty check
                 fs.copyRecursive(path.join(config._SRC_DIR, file), path.join(config._OUTPUT_DIR), function(error) {
+                    if(error) return cbCopiedFiles(error);
                     logger.debug("Copied " + file);
-                    return cbDoneLoop();
+                    cbDoneLoop();
                 });
             } else  {
                 return cbDoneLoop();
@@ -68,97 +83,128 @@ function copyFiles(cbCopiedFiles) {
     });
 };
 
-function writePages(cbPagesWritten) {
-    logger.task("Creating static pages");
+function getPagesData(cbGotPagesData) {
     async.each(Object.keys(config.pages), function iterator(page, cbDoneLoop) {
-        getPageData(page, function(error, pageData) {
+        var model = {};
+        // give access to extra settings from config.json (globals and pages)
+        for(var key in config.globals) model[key] = config.globals[key];
+        for(var key in config.pages[page]) model[key] = config.pages[page][key];
+        // common data
+        model.id = page;
+        // hbs template
+        loadTemplate(config.pages[page].template, function(error, hbsData) {
             if(error) return cbDoneLoop(error);
-
-            // split up pages if paginating
-            if(pageData.modelData.paginate) {
-                var pagedAttr = pageData.modelData[pageData.modelData.paginate.pagedAttr];
-                var currPage = -1;
-                var totalPages = pageData.modelData.paginate.totalPages = pagedAttr[pagedAttr.length-1].page;
-                async.each(pagedAttr, function iterator(item, cbDoneLoop2) {
-                    if(item.page !== currPage) {
-                        currPage = item.page;
-                        writePage(currPage, pageData, function(error) {
-                            if(error) return cbPageWritten(error);
-                            cbDoneLoop2();
-                        });
-                    } else {
-                        // already written this page, so do nothing
-                        cbDoneLoop2();
-                    }
-                }, cbDoneLoop);
-            } else {
-                writePage(1, pageData, function pageWritten(error) {
-                    if(error) return cbPagesWritten(error);
-                    cbDoneLoop();
-                });
-            }
+            model.templates = {
+                page: hbsData
+            };
         });
+        // TODO add a config to denote page/not page
+        // TODO something more flexible than "blog" (to match paginate)
+        // TODO also add config.js for dynamic navbar (i.e. buttons based on each page)
+        switch(page) {
+            case "blog":
+                async.parallel([
+                    getBlogPosts,
+                    function(done) {
+                        loadTemplate("post.hbs", done);
+                    }
+                ], function(error, results) {
+                    if(error) return cbDoneLoop(error);
+                    logger.debug("Got " + logger.var(page) + " page data");
+
+                    model.posts = results[0];
+                    model.templates.post = results[1];
+                    pagesData[page] = model;
+
+                    cbDoneLoop(null);
+                });
+                break;
+            default:
+                getPageContent(page, function gotContent(error, body) {
+                    if(error) return cbDoneLoop(error);
+                    logger.debug("Got " + logger.var(page) + " page data");
+
+                    model.body = body;
+                    pagesData[page] = model;
+
+                    cbDoneLoop(null);
+                });
+                break;
+        }
+    }, cbGotPagesData);
+};
+
+function writePages(cbPagesWritten) {
+    async.each(Object.keys(config.pages), function iterator(page, cbDoneLoop) {
+        var pageData = pagesData[page];
+        // split up pages if paginating
+        if(pageData.paginate) {
+            var pagedAttr = pageData[pageData.paginate.pagedAttr];
+            var currPage = -1;
+            var totalPages = pageData.paginate.totalPages = pagedAttr[pagedAttr.length-1].page;
+            async.each(pagedAttr, function iterator(item, cbDoneLoop2) {
+                if(item.page !== currPage) {
+                    currPage = item.page;
+                    writePage(currPage, pageData, function(error) {
+                        if(error) return cbPageWritten(error);
+                        cbDoneLoop2();
+                    });
+                } else cbDoneLoop2();
+            }, cbDoneLoop);
+        } else {
+            writePage(1, pageData, function pageWritten(error) {
+                if(error) return cbPagesWritten(error);
+                cbDoneLoop();
+            });
+        }
     }, cbPagesWritten);
 };
 
-function getPageData(name, cbGotPageData) {
-    fs.readFile(path.join(config._TEMPLATES_DIR, config.pages[name].template), "utf-8", function onRead(error, hbsData) {
-        if(error) return cbGotPageData(error);
-
-        getModel(name, function(error, modelData) {
-            if(error) return cbGotPageData(error);
-            cbGotPageData(null, { hbsData: hbsData, modelData: modelData });
-        });
-    });
-};
-
 function writePage(pageNo, pageData, cbPageWritten) {
-    // set the page no
-    pageData.modelData.page = pageNo;
-
-    var template = handlebars.compile(pageTemplate.replace("[PAGE_CONTENT]", pageData.hbsData));
-    var html = template(pageData.modelData);
     // work out the output path
-    var nameDir = (pageData.modelData.subDir === true) ? pageData.modelData.id : "";
+    var nameDir = (pageData.subDir === true) ? pageData.id : "";
     var pageDir = (pageNo > 1) ? "page" + (pageNo) : "";
-    if(pageDir !== "") pageData.modelData.filePrefix = "../" + pageData.modelData.filePrefix;
-    var outputDir = path.join(config._OUTPUT_DIR, nameDir);
+    var outputDir = path.join(config._OUTPUT_DIR, nameDir, pageDir);
+
+    var template = handlebars.compile(htmlTemplate.replace("[PAGE_CONTENT]", pageData.templates.page));
+    var html = template({
+        pageModel: pageData,
+        page: pageNo
+    });
     // make all dirs
-    fs.mkdirp(path.join(outputDir, pageDir), function onMkdir(error) {
+    fs.mkdirp(outputDir, function onMkdir(error) {
         if (error) return cbPageWritten(error);
-        fs.writeFile(path.join(outputDir, pageDir, pageData.modelData.index || "index.html"), html, function(error) {
-            if(!error) logger.debug("Created " + logger.file(path.join(nameDir, pageDir, pageData.modelData.index || "index.html")));
+        var filepath = path.join(outputDir, pageData.index || "index.html");
+        fs.writeFile(filepath, html, function(error) {
+            if(!error) logger.debug("Created " + logger.file(filepath.replace(config._OUTPUT_DIR + path.sep,"")));
             cbPageWritten(error);
         });
     });
 };
 
-function getModel(name, cbGotModel) {
-    var model = {};
-    // give access to extra settings from config.json (globals and pages)
-    for(var key in config.globals) model[key] = config.globals[key];
-    for(var key in config.pages[name]) model[key] = config.pages[name][key];
-    // common data
-    model.id = name;
-    model.filePrefix = (config.pages[name].subDir === true ? "../" : "");
+// maybe fo this in some more clever way...
+function writePosts(cbPostsWritten) {
+    var page = "blog";
+    var pageData = pagesData[page];
+    var template = handlebars.compile(htmlTemplate.replace("[PAGE_CONTENT]", pageData.templates.post));
 
-    // TODO add a config to denote page/not page
-    // TODO something more flexible than "blog" (to match paginate)
-    // TODO also add config.js for dynamic navbar (i.e. buttons based on each page)
-    switch(name) {
-        case "blog":
-            getBlogPosts(name, function gotPosts(error, posts) {
-                model.posts = posts;
-                cbGotModel(null, model);
+    async.each(pageData.posts, function iterator(post, cbDoneLoop) {
+        var html = template({
+            pageModel: pageData,
+            postModel: post
+        });
+        var outputDir = path.join(config._OUTPUT_DIR, post.dir);
+        // make all dirs
+        fs.mkdirp(outputDir, function onMkdir(error) {
+            if (error) return cbPostsWritten(error);
+            fs.writeFile(path.join(outputDir, "index.html"), html, function(error) {
+                if(error) return cbPostsWritten(error);
+                logger.debug("Created " + logger.file(path.join(outputDir.replace(config._OUTPUT_DIR + path.sep, ""), "index.html")));
+                return cbDoneLoop();
             });
-            break;
-        default:
-            getPageContent(name, function gotContent(error, body) {
-                model.body = body;
-                cbGotModel(null, model);
-            });
-    }
-};
+        });
+    }, cbPostsWritten);
+}
 
 function getPageContent(name, cbGotPageContent) {
     fs.readFile(path.join(config._PAGES_DIR, name + ".md"), "utf-8", function onRead(error, mdData) {
@@ -167,7 +213,7 @@ function getPageContent(name, cbGotPageContent) {
     });
 };
 
-function getBlogPosts(name, cbGotPosts) {
+function getBlogPosts(cbGotPosts) {
     // get list of post files
     fs.readdir(config._POSTS_DIR, function onRead(error, files) {
         if(error) return cbGotPosts(error);
@@ -178,40 +224,49 @@ function getBlogPosts(name, cbGotPosts) {
             if(file[0] === ".") return cbDoneLoop();
             fs.readFile(path.join(config._POSTS_DIR, file), "utf-8", function onRead(error, mdData) {
                 if(error) return cbGotPosts(error);
-
                 var postData = {};
                 // store metadata
                 var metaReg = /(\[!META(\{.*\})\])/;
-                try {
-                    var metaData = JSON.parse(mdData.match(metaReg)[2]);
-                    for(var key in metaData) postData[key] = metaData[key];
-                    // format data
-                    if(metaData.published) metaData.published = new Date(metaData.published);
-                    postData.body = mdRenderer(mdData.replace(metaReg, ""));
+                try { var metaData = JSON.parse(mdData.match(metaReg)[2]); }
+                catch(e) { logger.warn("Skipping " + logger.file(file) + ", invalid metadata"); }
+                for(var key in metaData) postData[key] = metaData[key];
 
-                    posts.push(postData);
-                } catch(e) {
-                    logger.warn("Skipping " + logger.file(file) + ", invalid metadata");
-                }
+                // format data
+                metaData.published = new Date(metaData.published);
 
+                // add folder location for permalinks and writing posts later
+                var datePrefix = utils.formatDate(postData.published, "YYYY/MM/DD").replace(/\//g,path.sep);
+                postData.dir = path.join("blog", datePrefix, postData.id + path.sep);
+                postData.permalink = config.server.url + "/" + postData.dir.replace(path.sep,"/");
+
+                postData.body = mdRenderer(mdData.replace(metaReg, ""));
+
+                posts.push(postData);
                 cbDoneLoop();
             });
         }, function doneLoop() {
             // organise: (reverse chronological, add page no. to post data)
             posts.sort(function(a,b) { return (a.published < b.published) ? 1 : -1; });
 
-            var conf = config.pages[name];
+            var conf = config.pages.blog;
             for (var i = 0, len = posts.length; i < len; i++) {
-                if(conf.paginate) posts[i].page = Math.floor(i/conf.paginate.pageSize)+1;
-                else posts[i].page = 1;
+                posts[i].page = (conf.paginate) ? Math.floor(i/conf.paginate.pageSize)+1 : 1;
             }
             cbGotPosts(null, posts);
         });
     });
 };
 
+/*
+* Helper functions
+*/
+
+function loadTemplate(filename, cbTemplateLoaded) {
+    fs.readFile(path.join(config._TEMPLATES_DIR, filename), "utf-8", cbTemplateLoaded);
+};
+
 /**
-* handlebars helpers
+* handlebars
 */
 handlebars.registerHelper("log", function(value) {
     logger.log(value);
