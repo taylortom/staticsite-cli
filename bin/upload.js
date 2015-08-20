@@ -21,6 +21,8 @@ module.exports = function upload(args, cbUploaded) {
         connTimeout: 5000
     };
 
+    client.on('error', cbUploaded);
+
     client.on('ready', function connReady() {
         logger.debug('Connected to server ' + logger.var(ftpConfig.host) + " as " + logger.var(ftpConfig.user));
         cleanRemote(function cleaned(error) {
