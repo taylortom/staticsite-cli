@@ -57,14 +57,11 @@ Blog.prototype.getPosts = function(cbGotPosts) {
 };
 
 Blog.prototype.parseMetaData = function(mdData, postData) {
-    // store metadata
     var metaReg = /(\[!META(\{.*\})\])/;
     var metaData = JSON.parse(mdData.match(metaReg)[2]);
-
     for(var key in metaData) postData[key] = metaData[key];
 
-    // format data
-    metaData.published = new Date(metaData.published);
+    postData.published = new Date(metaData.published);
 
     // add folder location for permalinks and writing posts later
     var datePrefix = utils.formatDate(postData.published, "YYYY/MM/DD").replace(/\//g,path.sep);
@@ -72,8 +69,6 @@ Blog.prototype.parseMetaData = function(mdData, postData) {
     postData.permalink = config.server.url + "/" + postData.dir.replace(path.sep,"/");
 };
 
-
-// maybe fo this in some more clever way...
 Blog.prototype.writePosts = function(cbPostsWritten) {
     var template = handlebars.compile(this.templateData.containerPage.replace("[PAGE_CONTENT]", this.templateData.post));
 
@@ -94,7 +89,6 @@ Blog.prototype.writePosts = function(cbPostsWritten) {
 
     },this), cbPostsWritten);
 };
-
 
 /*
 * OVERRIDES START HERE...
