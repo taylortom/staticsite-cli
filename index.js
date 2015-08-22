@@ -33,7 +33,6 @@ function processCommand() {
     if(command === "list" || args.h || args.help) return listCommands();
 
     try {
-        console.log(path.join(config._CLI_ROOT, "bin", command));
         var commandHandler = require(path.join(config._CLI_ROOT, "bin", command));
     } catch(e) {
         return logger.error("'" + command + "' is not a valid command. See 'tt list' for help.");

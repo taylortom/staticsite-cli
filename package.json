@@ -19,6 +19,10 @@
   "bin": {
     "tt": "index.js"
   },
+  "templateDefaults": {
+    "container": "page.html",
+    "page": "page.hbs"
+  },
   "testing": {
     "serverPort": 8000
   },
@@ -47,7 +51,8 @@
     "logTypes": {
       "command": {
         "prefix": "\n>> ",
-        "style": "cyan"
+        "style": "cyan",
+        "suffix": ".\n"
       },
       "task": {
         "prefix": "\n",
