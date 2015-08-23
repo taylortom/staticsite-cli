@@ -11,7 +11,6 @@ var logger = require("../js/logger");
 var Page = module.exports = function(id, data) {
     this.id = id
     this.type = "page";
-    // copy over config data
     for(var key in data) this[key] = data[key];
 }
 
@@ -80,7 +79,6 @@ Page.prototype.write = function(cbWritten) {
 };
 
 Page.prototype.writePage = function(pageNo, cbPageWritten) {
-    // work out the output path
     var nameDir = (this.subDir === true) ? this.id : "";
     var pageDir = (pageNo > 1) ? "page" + (pageNo) : "";
     var outputDir = path.join(config._OUTPUT_DIR, nameDir, pageDir);
@@ -89,7 +87,7 @@ Page.prototype.writePage = function(pageNo, cbPageWritten) {
         pageModel: this,
         page: pageNo
     });
-    // make all dirs
+
     fs.mkdirp(outputDir, _.bind(function onMkdir(error) {
         if (error) return cbPageWritten(error);
         var filepath = path.join(outputDir, this.index || "index.html");

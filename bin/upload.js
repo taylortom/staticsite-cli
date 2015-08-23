@@ -10,7 +10,9 @@ var logger = require("../js/logger");
 * Uploads the tmp/site files to the specified server via FTP
 */
 module.exports = function upload(args, cbUploaded) {
+    logger.task('Connecting to server');
     var client = new ftp();
+    client.connect(ftpConfig);
 
     // TODO encrypt these and store somewhere
     var ftpConfig = {
@@ -39,12 +41,6 @@ module.exports = function upload(args, cbUploaded) {
             });
         });
     });
-
-    // self starting
-    (function start() {
-        logger.task('Connecting to server');
-        client.connect(ftpConfig);
-    })();;
 
     function cleanRemote(cbCleaned) {
         client.list(config.server.base, function gotList(error, files) {

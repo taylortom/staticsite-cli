@@ -10,15 +10,15 @@ var args = minimist(process.argv.slice(2));
 var commands = {
     // core
     "init    ": "Downloads the repos and readies the file system",
-    "build   ": "Creates the output for the site",
+    "clean   ": "Removes everything in the output folder",
+    "copy    ": "Copies relevant files to the output folder",
+    "compile ": "Creates the static pages in the output folder",
+    "build   ": "Shortcut for clean + copy + compile",
     "launch  ": "launches the live site in the default browser",
     "serve   ": "Runs site on a local server",
     "post    ": "Writes a new post",
     "upload  ": "Copies files to hosted server",
     "save    ": "Stores the latest changes on git",
-    // compound
-    "test    ": "For offline testing: builds files, and calls serve",
-    "publish ": "Builds files, updates git, and uploads to FTP server"
 };
 
 // self-starter

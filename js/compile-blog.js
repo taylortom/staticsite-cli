@@ -4,7 +4,7 @@ var fs = require("fs.extra");
 var handlebars = require("handlebars");
 var path = require("path");
 
-var Page = require("./build-page");
+var Page = require("./compile-page");
 var config = require("../js/config");
 var logger = require("../js/logger");
 var mdRenderer = require("../js/mdRenderer");
