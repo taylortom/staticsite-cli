@@ -65,8 +65,7 @@ Blog.prototype.parseMetaData = function(mdData, postData) {
 
     // add folder location for permalinks and writing posts later
     var datePrefix = utils.formatDate(postData.published, "YYYY/MM/DD").replace(/\//g,path.sep);
-    postData.dir = path.join("blog", datePrefix, postData.id + path.sep);
-    postData.permalink = config.server.url + "/" + postData.dir.replace(path.sep,"/");
+    postData.dir = path.join(datePrefix, postData.id + path.sep);
 };
 
 Blog.prototype.writePosts = function(cbPostsWritten) {
@@ -78,7 +77,7 @@ Blog.prototype.writePosts = function(cbPostsWritten) {
             pageModel: this,
             postModel: post
         });
-        var outputDir = path.join(config._OUTPUT_DIR, post.dir);
+        var outputDir = path.join(config._OUTPUT_DIR, this.id, post.dir);
         fs.mkdirp(outputDir, _.bind(function onMkdir(error) {
             if (error) return cbPostsWritten(error);
             fs.writeFile(path.join(outputDir, "index.html"), html, _.bind(function(error) {
