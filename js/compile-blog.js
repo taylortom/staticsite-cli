@@ -74,6 +74,7 @@ Blog.prototype.writePosts = function(cbPostsWritten) {
 
     async.each(this.posts, _.bind(function iterator(post, cbDoneLoop) {
         var html = template({
+            title: post.title,
             pageModel: this,
             postModel: post
         });

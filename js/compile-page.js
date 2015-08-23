@@ -84,6 +84,7 @@ Page.prototype.writePage = function(pageNo, cbPageWritten) {
     var outputDir = path.join(config._OUTPUT_DIR, nameDir, pageDir);
     var template = handlebars.compile(this.templateData.containerPage.replace("[PAGE_CONTENT]", this.templateData.page));
     var html = template({
+        title: this.title,
         pageModel: this,
         page: pageNo
     });
