@@ -1,3 +1,4 @@
+var _ = require("underscore");
 var async = require("async");
 var handlebars = require("handlebars");
 
@@ -9,17 +10,13 @@ module.exports = function compile(args, cbCompiled) {
     async.forEachOf(config.pages, function iterator(page, key, cbDoneLoop) {
         try { var Page = require("../js/compile-" + key); }
         catch(e) { var Page = require("../js/compile-page"); }
-
         var p = new Page(key,page);
 
-        // TODO parallelise
-        p.loadTemplates(function(error) {
-            if(error) return cbCompiled(error);
-
-            p.loadData(function(error) {
-                if(error) return cbCompiled(error);
-                p.write(cbDoneLoop);
-            });
+        async.parallel([
+            _.bind(p.loadTemplates, p),
+            _.bind(p.loadData, p)
+        ], function(error) {
+            p.write(cbDoneLoop);
         });
     }, cbCompiled);
 };
@@ -28,7 +25,7 @@ module.exports = function compile(args, cbCompiled) {
 * handlebars helpers
 */
 handlebars.registerHelper("log", function(value) {
-    logger.debug("TEMPLATE", value);
+    logger.debug("handlebars: " + value);
 });
 
 handlebars.registerHelper("dateFormat", function(value) {
