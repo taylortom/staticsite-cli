@@ -56,6 +56,19 @@ Blog.prototype.getPosts = function(cbGotPosts) {
     }, this));
 };
 
+Blog.prototype.getTagData = function(cbGotTagData) {
+    var sorted = {};
+    async.each(this.posts, _.bind(function iterator(post, cbDoneLoop) {
+        async.each(post.tags, _.bind(function iterator(tag, cbDoneLoop2) {
+            if(!sorted[tag]) sorted[tag] = [ post ];
+            else sorted[tag].push(post);
+            cbDoneLoop2();
+        },this), cbDoneLoop);
+    },this), function(error) {
+        cbGotTagData(error, sorted);
+    });
+};
+
 Blog.prototype.parseMetaData = function(mdData, postData) {
     var metaReg = /(\[!META(\{.*\})\])/;
     var metaData = JSON.parse(mdData.match(metaReg)[2]);
@@ -77,17 +90,39 @@ Blog.prototype.writePosts = function(cbPostsWritten) {
             pageModel: this,
             postModel: post
         });
-        var outputDir = path.join(config._OUTPUT_DIR, this.id, post.dir);
+        var outputDir = path.join(config._OUTPUT_DIR, this.rootDir, post.dir);
         fs.mkdirp(outputDir, _.bind(function onMkdir(error) {
-            if (error) return cbPostsWritten(error);
+            if (error) return cbDoneLoop(error);
             fs.writeFile(path.join(outputDir, "index.html"), html, _.bind(function(error) {
-                if(error) return cbPostsWritten(error);
+                if(error) return cbDoneLoop(error);
                 logger.debug("Created " + logger.file(path.join(outputDir.replace(config._OUTPUT_DIR + path.sep, ""), "index.html")));
                 return cbDoneLoop();
             },this));
         }, this));
 
     },this), cbPostsWritten);
+};
+
+Blog.prototype.writeTags = function(cbTagsWritten) {
+    var template = handlebars.compile(this.templateData.containerPage.replace("[PAGE_CONTENT]", this.templateData.tags));
+    this.getTagData(_.bind(function(error, tagData) {
+        async.forEachOf(tagData, _.bind(function iterator(tag, key, cbDone) {
+            var html = template({
+                title: key,
+                pageModel: this,
+                tagData: tag
+            });
+            var outputDir = path.join(config._OUTPUT_DIR, this.rootDir, key);
+            fs.mkdirp(outputDir, _.bind(function onMkdir(error) {
+                if (error) return cbDone(error);
+                fs.writeFile(path.join(outputDir, "index.html"), html, _.bind(function(error) {
+                    if(error) return cbDone(error);
+                    logger.debug("Created " + logger.file(path.join(outputDir.replace(config._OUTPUT_DIR + path.sep, ""), "index.html")));
+                    cbDone();
+                },this));
+            }, this));
+        }, this), cbTagsWritten);
+    },this));
 };
 
 /*
@@ -97,24 +132,39 @@ Blog.prototype.writePosts = function(cbPostsWritten) {
 Blog.prototype.loadData = function(cbDataLoaded) {
     Page.prototype.loadData.call(this, _.bind(function loadedData(error) {
         if(error) return cbDataLoaded(error);
+        this.rootDir = path.sep + this.id;
         this.getPosts(cbDataLoaded);
     }, this));
 };
 
-Blog.prototype.loadTemplates = function(cbTemplateLoaded) {
+Blog.prototype.loadTemplates = function(cbTemplatesLoaded) {
     Page.prototype.loadTemplates.call(this, _.bind(function loadedTemplates(error) {
         if(error) return cbTemplateLoaded(error);
-
-        this.loadTextFile(path.join(config._TEMPLATES_DIR, this.templates.post), function fileRead(error, data) {
-            this.templateData.post = data;
-            cbTemplateLoaded(error);
-        });
+        async.parallel([
+            _.bind(function(done) {
+                this.loadTextFile(path.join(config._TEMPLATES_DIR, this.templates.post), done);
+            },this),
+            _.bind(function(done) {
+                this.loadTextFile(path.join(config._TEMPLATES_DIR, this.templates.tags), done);
+            },this)
+        ], _.bind(function(error, results) {
+            this.templateData.post = results[0];
+            this.templateData.tags = results[1];
+            cbTemplatesLoaded(error);
+        },this));
     }, this));
 };
 
 Blog.prototype.write = function(cbWritten) {
     Page.prototype.write.call(this, _.bind(function written(error) {
         if(error) return cbWritten(error);
-        this.writePosts(cbWritten);
+        async.parallel([
+            _.bind(function(done) {
+                this.writePosts(done);
+            },this),
+            _.bind(function(done) {
+                this.writeTags(done);
+            },this)
+        ], cbWritten);
     }, this));
 };
