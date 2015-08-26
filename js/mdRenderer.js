@@ -44,7 +44,7 @@ renderer.blockquote = function(value) {
 };
 
 renderer.image = function(href, title, alt) {
-    return "<img class='media' title='" + title + "' alt='" + alt + "' src='" + href.replace(replacements.localFile.match, replacements.localFile.replace) + "' />";
+    return "<a href='" + href + "'><img class='media' title='" + title + "' alt='" + alt + "' src='" + href.replace(replacements.localFile.match, replacements.localFile.replace) + "' /></a>";
 };
 
 // TODO this is only block-level
