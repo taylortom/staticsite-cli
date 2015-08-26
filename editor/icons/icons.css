@@ -1,0 +1,268 @@
+@font-face {
+	font-family: 'icons';
+	src:url('icons.eot?-4fpsci');
+	src:url('icons.eot?#iefix-4fpsci') format('embedded-opentype'),
+		url('icons.ttf?-4fpsci') format('truetype'),
+		url('icons.woff?-4fpsci') format('woff'),
+		url('icons.svg?-4fpsci#icons') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+[class^="icon-"], [class*=" icon-"] {
+	font-family: 'icons';
+	speak: none;
+	font-style: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: 1;
+	/* Better Font Rendering =========== */
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+.icon-home3:before {
+	content: "\e600";
+}
+.icon-pencil:before {
+	content: "\e64b";
+}
+.icon-pen:before {
+	content: "\e64c";
+}
+.icon-blog:before {
+	content: "\e64d";
+}
+.icon-file-text2:before {
+	content: "\e603";
+}
+.icon-file-picture:before {
+	content: "\e604";
+}
+.icon-folder:before {
+	content: "\e605";
+}
+.icon-price-tags:before {
+	content: "\e606";
+}
+.icon-display:before {
+	content: "\e607";
+}
+.icon-mobile:before {
+	content: "\e608";
+}
+.icon-tablet:before {
+	content: "\e609";
+}
+.icon-quotes-left:before {
+	content: "\e60a";
+}
+.icon-quotes-right:before {
+	content: "\e60b";
+}
+.icon-cog:before {
+	content: "\e60c";
+}
+.icon-gift:before {
+	content: "\e60d";
+}
+.icon-glass2:before {
+	content: "\e60e";
+}
+.icon-rocket:before {
+	content: "\e60f";
+}
+.icon-fire:before {
+	content: "\e610";
+}
+.icon-airplane:before {
+	content: "\e611";
+}
+.icon-truck:before {
+	content: "\e612";
+}
+.icon-sphere:before {
+	content: "\e613";
+}
+.icon-attachment:before {
+	content: "\e614";
+}
+.icon-star-full:before {
+	content: "\e615";
+}
+.icon-heart:before {
+	content: "\e616";
+}
+.icon-man:before {
+	content: "\e617";
+}
+.icon-woman:before {
+	content: "\e618";
+}
+.icon-man-woman:before {
+	content: "\e619";
+}
+.icon-happy:before {
+	content: "\e61a";
+}
+.icon-smile:before {
+	content: "\e61b";
+}
+.icon-tongue:before {
+	content: "\e61c";
+}
+.icon-sad:before {
+	content: "\e61d";
+}
+.icon-wink:before {
+	content: "\e61e";
+}
+.icon-grin:before {
+	content: "\e61f";
+}
+.icon-cool:before {
+	content: "\e620";
+}
+.icon-angry:before {
+	content: "\e621";
+}
+.icon-evil:before {
+	content: "\e622";
+}
+.icon-shocked:before {
+	content: "\e623";
+}
+.icon-baffled:before {
+	content: "\e624";
+}
+.icon-confused:before {
+	content: "\e625";
+}
+.icon-neutral:before {
+	content: "\e626";
+}
+.icon-hipster:before {
+	content: "\e627";
+}
+.icon-wondering:before {
+	content: "\e628";
+}
+.icon-sleepy:before {
+	content: "\e629";
+}
+.icon-frustrated:before {
+	content: "\e62a";
+}
+.icon-crying:before {
+	content: "\e62b";
+}
+.icon-warning:before {
+	content: "\e62c";
+}
+.icon-blocked:before {
+	content: "\e62d";
+}
+.icon-checkmark:before {
+	content: "\e62e";
+}
+.icon-arrow-up:before {
+	content: "\e601";
+}
+.icon-arrow-right:before {
+	content: "\e62f";
+}
+.icon-arrow-down:before {
+	content: "\e630";
+}
+.icon-arrow-left:before {
+	content: "\e631";
+}
+.icon-arrow-up2:before {
+	content: "\e602";
+}
+.icon-arrow-right2:before {
+	content: "\e632";
+}
+.icon-arrow-down2:before {
+	content: "\e633";
+}
+.icon-arrow-left2:before {
+	content: "\e634";
+}
+.icon-circle-up:before {
+	content: "\e635";
+}
+.icon-circle-right:before {
+	content: "\e636";
+}
+.icon-circle-down:before {
+	content: "\e637";
+}
+.icon-circle-left:before {
+	content: "\e638";
+}
+.icon-command:before {
+	content: "\e64e";
+}
+.icon-shift:before {
+	content: "\e64f";
+}
+.icon-ctrl:before {
+	content: "\e650";
+}
+.icon-opt:before {
+	content: "\e651";
+}
+.icon-embed2:before {
+	content: "\e639";
+}
+.icon-terminal:before {
+	content: "\e63a";
+}
+.icon-share2:before {
+	content: "\e63b";
+}
+.icon-facebook2:before {
+	content: "\e63c";
+}
+.icon-instagram:before {
+	content: "\e63d";
+}
+.icon-twitter:before {
+	content: "\e63e";
+}
+.icon-github:before {
+	content: "\e63f";
+}
+.icon-github3:before {
+	content: "\e640";
+}
+.icon-github5:before {
+	content: "\e641";
+}
+.icon-apple:before {
+	content: "\e642";
+}
+.icon-finder:before {
+	content: "\e643";
+}
+.icon-android:before {
+	content: "\e644";
+}
+.icon-windows8:before {
+	content: "\e645";
+}
+.icon-linkedin:before {
+	content: "\e646";
+}
+.icon-linkedin2:before {
+	content: "\e647";
+}
+.icon-lastfm:before {
+	content: "\e648";
+}
+.icon-lastfm2:before {
+	content: "\e649";
+}
+.icon-libreoffice:before {
+	content: "\e64a";
+}
