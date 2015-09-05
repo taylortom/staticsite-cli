@@ -82,11 +82,9 @@ Blog.prototype.parseMetaData = function(mdData, postData) {
 };
 
 Blog.prototype.writePosts = function(cbPostsWritten) {
-    var template = handlebars.compile(this.templateData.containerPage.replace("[PAGE_CONTENT]", this.templateData.post));
-
+    var template = handlebars.compile(this.templateData.containerPage.replace("[PAGE_CONTENT]", this.templateData.pages.post));
     async.each(this.posts, _.bind(function iterator(post, cbDoneLoop) {
         var html = template({
-            title: post.title,
             pageModel: this,
             postModel: post
         });
@@ -99,16 +97,14 @@ Blog.prototype.writePosts = function(cbPostsWritten) {
                 return cbDoneLoop();
             },this));
         }, this));
-
     },this), cbPostsWritten);
 };
 
 Blog.prototype.writeTags = function(cbTagsWritten) {
-    var template = handlebars.compile(this.templateData.containerPage.replace("[PAGE_CONTENT]", this.templateData.tags));
+    var template = handlebars.compile(this.templateData.containerPage.replace("[PAGE_CONTENT]", this.templateData.pages.tags));
     this.getTagData(_.bind(function(error, tagData) {
         async.forEachOf(tagData, _.bind(function iterator(tag, key, cbDone) {
             var html = template({
-                title: key,
                 pageModel: this,
                 tagData: tag
             });
@@ -137,34 +133,9 @@ Blog.prototype.loadData = function(cbDataLoaded) {
     }, this));
 };
 
-Blog.prototype.loadTemplates = function(cbTemplatesLoaded) {
-    Page.prototype.loadTemplates.call(this, _.bind(function loadedTemplates(error) {
-        if(error) return cbTemplateLoaded(error);
-        async.parallel([
-            _.bind(function(done) {
-                this.loadTextFile(path.join(config._TEMPLATES_DIR, this.templates.post), done);
-            },this),
-            _.bind(function(done) {
-                this.loadTextFile(path.join(config._TEMPLATES_DIR, this.templates.tags), done);
-            },this)
-        ], _.bind(function(error, results) {
-            this.templateData.post = results[0];
-            this.templateData.tags = results[1];
-            cbTemplatesLoaded(error);
-        },this));
-    }, this));
-};
-
-Blog.prototype.write = function(cbWritten) {
-    Page.prototype.write.call(this, _.bind(function written(error) {
-        if(error) return cbWritten(error);
-        async.parallel([
-            _.bind(function(done) {
-                this.writePosts(done);
-            },this),
-            _.bind(function(done) {
-                this.writeTags(done);
-            },this)
-        ], cbWritten);
-    }, this));
+Blog.prototype.writeSubPages = function(cbPageWritten) {
+    async.parallel([
+        _.bind(this.writeTags, this),
+        _.bind(this.writePosts, this)
+    ], cbPageWritten);
 };
