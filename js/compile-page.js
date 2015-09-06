@@ -103,27 +103,35 @@ Page.prototype.writePages = function(cbPageWritten) {
         this.writePageDelegate(1, cbPageWritten);
     }
 };
-
-Page.prototype.writeSubPages = function(cbPageWritten) {
-    // TO BE OVERWRITTEN IN SUBCLASSES!!
-    cbPageWritten();
-};
-
 Page.prototype.writePageDelegate = function(pageNo, cbPageWritten) {
     var nameDir = (this.subDir === true) ? this.id : "";
     var pageDir = (pageNo > 1) ? "page" + (pageNo) : "";
+    var filename = this.index || "index.html";
     var outputDir = path.join(config._OUTPUT_DIR, nameDir, pageDir);
 
-    var template = handlebars.compile(this.templateData.containerPage.replace("[PAGE_CONTENT]", this.templateData.page));
-    var html = template({
-        title: this.title.text,
-        pageModel: this,
-        page: pageNo
-    });
+    // model data
+    var model = {};
+    model.title = this.title;
+    if(this.description && this.description.show) model.description = this.description.text;
+    model.pageModel = this;
+    model.page = pageNo;
 
+    this.writePage(model, this.templateData.page, filename, outputDir, cbPageWritten);
+};
+
+Page.prototype.writeSubPages = function(cbPageWritten) {
+    async.forEachOf(this.pages, _.bind(function(page, name, cbDoneLoop) {
+        var funcName = "write" + name[0].toUpperCase() + name.slice(1);
+        if(this[funcName]) this[funcName].call(this, cbDoneLoop);
+    }, this), cbPageWritten);
+};
+
+Page.prototype.writePage = function(model, template, filename, outputDir, cbPageWritten) {
+    var hbsTemplate = handlebars.compile(this.templateData.containerPage.replace("[PAGE_CONTENT]", template));
+    var html = hbsTemplate(model);
     fs.mkdirp(outputDir, _.bind(function onMkdir(error) {
         if (error) return cbPageWritten(error);
-        var filepath = path.join(outputDir, this.index || "index.html");
+        var filepath = path.join(outputDir, filename);
         fs.writeFile(filepath, html, _.bind(function(error) {
             if(!error) logger.debug("Created " + logger.file(filepath.replace(config._OUTPUT_DIR + path.sep,"")));
             cbPageWritten(error);

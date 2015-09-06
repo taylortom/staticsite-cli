@@ -81,44 +81,38 @@ Blog.prototype.parseMetaData = function(mdData, postData) {
     postData.dir = path.join(datePrefix, postData.id + path.sep);
 };
 
+Page.prototype.writeArchive = function(cbArchiveWritten) {
+    var model = {
+        title: { "text": this.pages.archive.title },
+        description: this.pages.archive.description,
+        pageModel: this,
+    };
+    var outputDir = path.join(config._OUTPUT_DIR, this.rootDir, "archive");
+    this.writePage(model, this.templateData.pages.archive, "index.html", outputDir, cbArchiveWritten);
+};
+
 Blog.prototype.writePosts = function(cbPostsWritten) {
-    var template = handlebars.compile(this.templateData.containerPage.replace("[PAGE_CONTENT]", this.templateData.pages.post));
     async.each(this.posts, _.bind(function iterator(post, cbDoneLoop) {
-        var html = template({
-            title: post.title,
+        var model = {
             pageModel: this,
             postModel: post
-        });
+        };
         var outputDir = path.join(config._OUTPUT_DIR, this.rootDir, post.dir);
-        fs.mkdirp(outputDir, _.bind(function onMkdir(error) {
-            if (error) return cbDoneLoop(error);
-            fs.writeFile(path.join(outputDir, "index.html"), html, _.bind(function(error) {
-                if(error) return cbDoneLoop(error);
-                logger.debug("Created " + logger.file(path.join(outputDir.replace(config._OUTPUT_DIR + path.sep, ""), "index.html")));
-                return cbDoneLoop();
-            },this));
-        }, this));
+        this.writePage(model, this.templateData.pages.posts, "index.html", outputDir, cbDoneLoop);
     },this), cbPostsWritten);
 };
 
 Blog.prototype.writeTags = function(cbTagsWritten) {
-    var template = handlebars.compile(this.templateData.containerPage.replace("[PAGE_CONTENT]", this.templateData.pages.tags));
     this.getTagData(_.bind(function(error, tagData) {
-        async.forEachOf(tagData, _.bind(function iterator(tag, key, cbDone) {
-            var html = template({
-                title: "Tag: " + key,
+        async.forEachOf(tagData, _.bind(function iterator(tag, key, cbDoneLoop) {
+            var model = {
+                // TODO: get rid of this hacky line:
+                title: { "text": this.pages.tags.title.replace("[TAG]", key) },
                 pageModel: this,
                 tagData: tag
-            });
+            };
             var outputDir = path.join(config._OUTPUT_DIR, this.rootDir, key);
-            fs.mkdirp(outputDir, _.bind(function onMkdir(error) {
-                if (error) return cbDone(error);
-                fs.writeFile(path.join(outputDir, "index.html"), html, _.bind(function(error) {
-                    if(error) return cbDone(error);
-                    logger.debug("Created " + logger.file(path.join(outputDir.replace(config._OUTPUT_DIR + path.sep, ""), "index.html")));
-                    cbDone();
-                },this));
-            }, this));
+            this.writePage(model, this.templateData.pages.tags, "index.html", outputDir, cbDoneLoop);
         }, this), cbTagsWritten);
     },this));
 };
@@ -133,11 +127,4 @@ Blog.prototype.loadData = function(cbDataLoaded) {
         this.rootDir = path.sep + this.id;
         this.getPosts(cbDataLoaded);
     }, this));
-};
-
-Blog.prototype.writeSubPages = function(cbPageWritten) {
-    async.parallel([
-        _.bind(this.writeTags, this),
-        _.bind(this.writePosts, this)
-    ], cbPageWritten);
 };
