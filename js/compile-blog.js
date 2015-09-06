@@ -83,7 +83,7 @@ Blog.prototype.parseMetaData = function(mdData, postData) {
 
 Page.prototype.writeArchive = function(cbArchiveWritten) {
     var model = {
-        title: { "text": this.pages.archive.title },
+        title: { "text": this.pages.archive.title, "show": true },
         description: this.pages.archive.description,
         pageModel: this,
     };
@@ -107,7 +107,7 @@ Blog.prototype.writeTags = function(cbTagsWritten) {
         async.forEachOf(tagData, _.bind(function iterator(tag, key, cbDoneLoop) {
             var model = {
                 // TODO: get rid of this hacky line:
-                title: { "text": this.pages.tags.title.replace("[TAG]", key) },
+                title: { "text": this.pages.tags.title.replace("[TAG]", key), "show": true },
                 pageModel: this,
                 tagData: tag
             };
