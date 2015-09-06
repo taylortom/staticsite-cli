@@ -85,6 +85,7 @@ Blog.prototype.writePosts = function(cbPostsWritten) {
     var template = handlebars.compile(this.templateData.containerPage.replace("[PAGE_CONTENT]", this.templateData.pages.post));
     async.each(this.posts, _.bind(function iterator(post, cbDoneLoop) {
         var html = template({
+            title: post.title,
             pageModel: this,
             postModel: post
         });
@@ -105,6 +106,7 @@ Blog.prototype.writeTags = function(cbTagsWritten) {
     this.getTagData(_.bind(function(error, tagData) {
         async.forEachOf(tagData, _.bind(function iterator(tag, key, cbDone) {
             var html = template({
+                title: "Tag: " + key,
                 pageModel: this,
                 tagData: tag
             });

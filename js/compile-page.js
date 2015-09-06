@@ -116,6 +116,7 @@ Page.prototype.writePageDelegate = function(pageNo, cbPageWritten) {
 
     var template = handlebars.compile(this.templateData.containerPage.replace("[PAGE_CONTENT]", this.templateData.page));
     var html = template({
+        title: this.title.text,
         pageModel: this,
         page: pageNo
     });
