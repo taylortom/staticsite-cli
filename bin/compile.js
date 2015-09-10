@@ -25,7 +25,7 @@ module.exports = function compile(args, cbCompiled) {
 * handlebars helpers
 */
 handlebars.registerHelper("log", function(value) {
-    logger.debug("handlebars: " + value);
+    logger.debug("hbs.log: " + value);
 });
 
 handlebars.registerHelper("dateFormat", function(value) {
