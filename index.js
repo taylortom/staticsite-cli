@@ -41,7 +41,9 @@ function processCommand() {
     logger.command("Running " + command);
     commandHandler(args, function finishedCommand(error, data) {
         if(error) logger.error(error);
-        else logger.done("Finished " + command);
+        logger.done("Finished " + command);
+        // make sure we close properly
+        process.exit();
     });
 };
 
