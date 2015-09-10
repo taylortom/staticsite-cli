@@ -11,7 +11,7 @@
   </head>
   <body>
     <div class="container wrapper">
-      <div id="sidebar">
+      <!--<div id="sidebar">
           <div class="inner white_bg">
             <ul>
               <li>One</li>
@@ -19,15 +19,17 @@
               <li>Three</li>
               <li>Here's a long Four</li>
             </ul>
+        </div>-->
+        <div id="main">
+          <form  method="post">
+            <input type="text" class="input white_bg title heading" name="title" placeholder="Post Title"/>
+            <textarea class="input white_bg body" name="body" placeholder="Post body"></textarea>
+            <input type="text" class="input white_bg input-tag" placeholder="tags"/>
+            <input type="text" class="hidden" name="tags"/>
+            <div class="tags hidden"></div>
+            <button class="submit">Post!</button>
+          </form>
         </div>
-      </div>
-      <div id="main">
-        <form action="/" method="post">
-          <input type="text" class="input white_bg title heading" name="title" value="Hello"/>
-          <textarea class="input white_bg body" name="body"># Heading</textarea>
-          <input type="text" class="input white_bg tags" name="tags" value="tag"/>
-          <button class="submit">Post!</button>
-        </form>
       </div>
     </div>
   </body>

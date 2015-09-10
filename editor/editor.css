@@ -1,14 +1,28 @@
+.hidden { display: none !important; }
+
+.warning {
+    border: 2px solid red !important;
+    background-color: pink !important;
+}
+
 html, body {
-    background:#F9F9F9;
+    background: #E2E2E2;
     padding: 0;
     margin: 0;
-    font: 14pt sans-serif;
+    font: 12pt sans-serif;
     color: #333;
 }
 
+.wrapper {
+    padding-top: 1%;
+}
+
 #main {
-    float: right;
-    width: 80%;
+    max-width: 700px;
+    width: 98%;
+    /*float: right;*/
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #sidebar {
@@ -23,12 +37,6 @@ html, body {
     padding: 0;
 }
 
-.wrapper {
-    width: 80%;
-    padding: 10px;
-    margin: 0 auto;
-}
-
 .white_bg {
     padding: 15px;
     background: white;
@@ -40,34 +48,49 @@ html, body {
 
 .input {
     outline: none;
-    font-size: inherit;
     display: inline-block;
-    width: 100%;;
-    margin-bottom: 6px;
-}
-
-.input.title {
-    font-size: 110%;
+    font-size: inherit;
+    height: 5%;
+    width: 100%;
+    margin-bottom: 1%;
 }
 
 .input.heading {
     font-size: 150%;
+    height: 7%;
 }
 
 .input.body {
-    height: 70%;
+    height: 71%;
+    min-height: 250px;
     font-family: monospace;
-    font-size: 90%;
+}
+
+.tags {
+    margin-bottom: 2%;
+    float: left;
+    width: 92%
+}
+
+.tag {
+    display: inline-block;
+    background-color: grey;
+    color: white;
+    border-radius: 2px;
+    padding: 5px 6px 5px 6px;
+    margin: 3px;
+    text-decoration: none;
 }
 
 button.submit {
+    float: right;
     border: none;
+    height: 6%;
     display: block;
     margin-left: auto;
     margin-right: 0;
     font-size: inherit;
     font-weight: bold;
-    margin-top: 20px;
     cursor: pointer;
     background: transparent;
 }
