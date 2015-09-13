@@ -53,10 +53,6 @@ Blog.prototype.organisePosts = function() {
     for (var i = 0, len = this.posts.length; i < len; i++) {
         this.posts[i].page = (conf.paginate) ? Math.floor(i/conf.paginate.pageSize)+1 : 1;
     }
-
-    for (var i = 0, len = this.posts.length; i < len; i++) {
-        console.log(this.posts[i].page, this.posts[i].title);
-    }
 };
 
 Blog.prototype.getTagData = function(cbGotTagData) {
