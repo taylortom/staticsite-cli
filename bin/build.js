@@ -1,12 +1,10 @@
 var async = require("async");
+var logger = require("../js/logger");
 
 // sub-tasks
 var clean = require("./clean");
 var compile = require("./compile");
 var copy = require("./copy");
-
-var logger = require("../js/logger");
-var logger = require("../js/logger");
 
 module.exports = function build(args, cbCompiled) {
     clean(args, function(error) {
