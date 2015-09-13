@@ -8,7 +8,7 @@ var path = require("path");
 var config = require("../js/config");
 var logger = require("../js/logger");
 
-var Page = module.exports = function(id, data) {
+var Page = module.exports = function(id, data, args) {
     this.id = id
     this.type = "page";
     for(var key in data) this[key] = data[key];
@@ -54,7 +54,6 @@ Page.prototype.loadData = function(cbDataLoaded) {
     if(this.type === "page") {
         this.loadMarkdownData(path.join(config._PAGES_DIR, this.id + ".md"), _.bind(function gotContent(error, mdData) {
             if(error) return cbDataLoaded(error);
-
             this.body = mdData;
             cbDataLoaded();
         }, this));

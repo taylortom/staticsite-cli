@@ -10,50 +10,53 @@ var logger = require("../js/logger");
 var mdRenderer = require("../js/mdRenderer");
 var utils = require("../js/utils");
 
-var Blog = module.exports = function(id, data) {
+var Blog = module.exports = function(id, data, args) {
     Page.call(this, id, data);
     this.type = "blog";
+    this.includeDrafts = args.drafts || args.d;
 };
 
 Blog.prototype = Object.create(Page.prototype);
 Blog.prototype.contructor = Blog;
 
 // load all .md posts
-Blog.prototype.getPosts = function(cbGotPosts) {
-    fs.readdir(config._POSTS_DIR, _.bind(function onRead(error, files) {
-        if(error) return cbGotPosts(error);
+Blog.prototype.getPosts = function(dir, cbGotPosts) {
+    fs.readdir(dir, _.bind(function onRead(error, files) {
+        if(error || files.length === 0) return cbGotPosts(error);
         var posts = [];
         async.forEachOf(utils.fileFilter(files, { type: ".md" }), _.bind(function iterator(file, index, cbDoneLoop) {
-            fs.readFile(path.join(config._POSTS_DIR, file), "utf-8", _.bind(function onRead(error, mdData) {
+            fs.readFile(path.join(dir, file), "utf-8", _.bind(function onRead(error, mdData) {
                 if(error) return cbGotPosts(error);
 
                 var postData = {};
-
-                try {
-                    this.parseMetaData(mdData, postData);
-                }
-                catch(e) {
-                    console.log(e);
-                    logger.warn("Skipping " + logger.file(file) + ", invalid metadata");
-                }
-
+                try { this.parseMetaData(mdData, postData); }
+                catch(e) { logger.warn("Skipping " + logger.file(file) + ", invalid metadata"); }
                 postData.body = mdRenderer(mdData.replace(/.*}]/, ""));
                 posts.push(postData);
 
                 cbDoneLoop();
             }, this));
-        }, this), _.bind(function doneLoop() {
-            // organise: (reverse chronological, add page no. to post data)
-            posts.sort(function(a,b) { return (a.published < b.published) ? 1 : -1; });
-
-            var conf = config.pages.blog;
-            for (var i = 0, len = posts.length; i < len; i++) {
-                posts[i].page = (conf.paginate) ? Math.floor(i/conf.paginate.pageSize)+1 : 1;
-            }
-            this.posts = posts;
-            cbGotPosts();
-        }, this));
+        }, this), function(error) {
+            cbGotPosts(error, posts);
+        });
     }, this));
+};
+
+// sorts and assigns page numbers
+Blog.prototype.organisePosts = function() {
+    if(!this.posts || this.posts.length < 2) return;
+
+    // reverse chronological
+    this.posts.sort(function(a,b) { return (a.published < b.published) ? 1 : -1; });
+
+    var conf = config.pages.blog;
+    for (var i = 0, len = this.posts.length; i < len; i++) {
+        this.posts[i].page = (conf.paginate) ? Math.floor(i/conf.paginate.pageSize)+1 : 1;
+    }
+
+    for (var i = 0, len = this.posts.length; i < len; i++) {
+        console.log(this.posts[i].page, this.posts[i].title);
+    }
 };
 
 Blog.prototype.getTagData = function(cbGotTagData) {
@@ -126,6 +129,28 @@ Blog.prototype.loadData = function(cbDataLoaded) {
     Page.prototype.loadData.call(this, _.bind(function loadedData(error) {
         if(error) return cbDataLoaded(error);
         this.rootDir = path.sep + this.id;
-        this.getPosts(cbDataLoaded);
+        this.posts = [];
+        //  TODO refactor this
+        async.parallel([
+            _.bind(function(cbDone) {
+                this.getPosts(config._POSTS_DIR, _.bind(function(error, postData) {
+                    if(error) return cbDone(error);
+                    this.posts = this.posts.concat(postData);
+                    cbDone();
+                }, this));
+            }, this),
+            _.bind(function(cbDone) {
+                if(!this.includeDrafts) return cbDone();
+                this.getPosts(config._DRAFTS_DIR, _.bind(function(error, postData) {
+                    if(error) return cbDone(error);
+                    this.posts = this.posts.concat(postData);
+                    cbDone();
+                }, this));
+            }, this),
+        ], _.bind(function doneLoop(error) {
+            if(error) cbDataLoaded(error);
+            this.organisePosts();
+            cbDataLoaded();
+        }, this));
     }, this));
 };

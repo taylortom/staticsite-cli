@@ -10,7 +10,7 @@ module.exports = function compile(args, cbCompiled) {
     async.forEachOf(config.pages, function iterator(page, key, cbDoneLoop) {
         try { var Page = require("../js/compile-" + key); }
         catch(e) { var Page = require("../js/compile-page"); }
-        var p = new Page(key,page);
+        var p = new Page(key, page, args);
 
         async.parallel([
             _.bind(p.loadTemplates, p),

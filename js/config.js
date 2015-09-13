@@ -12,6 +12,7 @@ var config = module.exports = {};
     config._SRC_DIR = path.join(config._TEMP_DIR, "src");
     config._PAGES_DIR = path.join(config._SRC_DIR, "_pages");
     config._POSTS_DIR = path.join(config._SRC_DIR, "_posts");
+    config._DRAFTS_DIR = path.join(config._POSTS_DIR, "drafts");
     config._TEMPLATES_DIR = path.join(config._SRC_DIR, "_templates");
     config._POST_ASSETS_DIR = path.join(config._SRC_DIR, "assets");
 
