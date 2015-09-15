@@ -84,6 +84,7 @@
     "handlebars": "^3.0.3",
     "highlight.js": "^8.7.0",
     "marked": "^0.3.5",
+    "minimist": "^1.2.0",
     "moment": "^2.10.6",
     "nodegit": "^0.4.1",
     "open": "0.0.5",
