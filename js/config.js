@@ -6,19 +6,20 @@ var path = require("path");
 var config = module.exports = {};
 
 (function init(){
+    // CLI JSON
+    addConfigFile("../package.json");
+
     config._CLI_ROOT = path.dirname(require.main.filename);
-    config._TEMP_DIR = path.join(config._CLI_ROOT, "tmp");
-    config._OUTPUT_DIR = path.join(config._TEMP_DIR, "site");
-    config._SRC_DIR = path.join(config._TEMP_DIR, "src");
+    config._OUTPUT_DIR = path.join(config._CLI_ROOT, "site");
+    config._SRC_DIR = config.siteSrc || path.join(config._CLI_ROOT, "src");
     config._PAGES_DIR = path.join(config._SRC_DIR, "_pages");
     config._POSTS_DIR = path.join(config._SRC_DIR, "_posts");
     config._DRAFTS_DIR = path.join(config._POSTS_DIR, "drafts");
     config._TEMPLATES_DIR = path.join(config._SRC_DIR, "_templates");
     config._POST_ASSETS_DIR = path.join(config._SRC_DIR, "assets");
 
-    // load up the JSON files
-    addConfigFile("../package.json"); // CLI
-    addConfigFile(path.join(config._SRC_DIR, "_config.json")); // site
+    // Site JSON
+    addConfigFile(path.join(config._SRC_DIR, "_config.json"));
 })();
 
 function addConfigFile(filename) {

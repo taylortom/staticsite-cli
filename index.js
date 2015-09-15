@@ -30,6 +30,7 @@ var commands = {
 function processCommand() {
     var command = args._[0];
 
+    // if(!command) ;
     if(command === "list" || args.h || args.help) return listCommands();
 
     try {
