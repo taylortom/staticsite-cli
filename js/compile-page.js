@@ -6,6 +6,7 @@ var mdRenderer = require("../js/mdRenderer");
 var path = require("path");
 
 var config = require("../js/config");
+var helpers = require("../js/helpers");
 var logger = require("../js/logger");
 
 var Page = module.exports = function(id, data, args) {
