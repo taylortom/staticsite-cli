@@ -1,6 +1,6 @@
 var _ = require("underscore");
 var async = require("async");
-var fs = require("fs.extra");
+var fs = require("fs-extra");
 var handlebars = require("handlebars");
 var mdRenderer = require("../js/mdRenderer");
 var path = require("path");

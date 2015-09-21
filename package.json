@@ -1,99 +1,101 @@
 {
-    "name": "taylortom-cli",
-    "version": "0.0.1",
-    "description": "Command line interface for taylortom.co.uk.",
-    "preferGlobal": true,
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/taylortom/taylortom-cli"
+  "name": "taylortom-cli",
+  "version": "0.0.1",
+  "description": "Command line interface for taylortom.co.uk.",
+  "preferGlobal": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/taylortom/taylortom-cli"
+  },
+  "keywords": [
+    "taylortom"
+  ],
+  "author": "Thomas Taylor <me@taylortom.co.uk>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/taylortom/taylortom-cli/issues"
+  },
+  "homepage": "https://github.com/taylortom/taylortom-cli",
+  "bin": {
+    "tt": "index.js"
+  },
+  "siteSrc": "/Users/tom/Projects/taylortom-src",
+  "templateDefaults": {
+    "container": "page.html",
+    "page": "page.hbs"
+  },
+  "testing": {
+    "serverPort": 8000
+  },
+  "logging": {
+    "filter": "debug",
+    "logFilters": {
+      "debug": [
+        "*"
+      ],
+      "normal": [
+        "command",
+        "task",
+        "done",
+        "info",
+        "warn",
+        "error"
+      ],
+      "basic": [
+        "command",
+        "done",
+        "warn",
+        "error"
+      ],
+      "none": []
     },
-    "keywords": [
-        "taylortom"
-    ],
-    "author": "Thomas Taylor <me@taylortom.co.uk>",
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/taylortom/taylortom-cli/issues"
-    },
-    "homepage": "https://github.com/taylortom/taylortom-cli",
-    "bin": {
-        "tt": "index.js"
-    },
-    "siteSrc": "/Projects/taylortom-src",
-    "templateDefaults": {
-        "container": "page.html",
-        "page": "page.hbs"
-    },
-    "testing": {
-        "serverPort": 8000
-    },
-    "logging": {
-        "filter": "debug",
-        "logFilters": {
-            "debug": [
-                "*"
-            ],
-            "normal": [
-                "command",
-                "task",
-                "done",
-                "info",
-                "warn",
-                "error"
-            ],
-            "basic": [
-                "command",
-                "done",
-                "warn",
-                "error"
-            ],
-            "none": []
-        },
-        "logTypes": {
-            "command": {
-                "prefix": "\n>> ",
-                "style": "cyan",
-                "suffix": ".\n"
-            },
-            "task": {
-                "prefix": "\n",
-                "style": "underline"
-            },
-            "info": {},
-            "done": {
-                "prefix": "\n>> ",
-                "suffix": ".\n",
-                "style": "green"
-            },
-            "debug": {},
-            "warn": {
-                "prefix": "!! ",
-                "style": "yellow"
-            },
-            "error": {
-                "prefix": "!! ",
-                "style": "red"
-            }
-        }
-    },
-    "dependencies": {
-        "async": "^1.4.2",
-        "chalk": "^1.1.0",
-        "finalhandler": "^0.4.0",
-        "fs.extra": "^1.3.2",
-        "ftp": "^0.3.10",
-        "handlebars": "^3.0.3",
-        "highlight.js": "^8.7.0",
-        "marked": "^0.3.5",
-        "minimist": "^1.2.0",
-        "moment": "^2.10.6",
-        "nodegit": "^0.4.1",
-        "open": "0.0.5",
-        "path": "^0.11.14",
-        "prompt": "^0.2.14",
-        "q": "^1.4.1",
-        "querystring": "^0.2.0",
-        "serve-static": "^1.10.0",
-        "underscore": "^1.8.3"
+    "logTypes": {
+      "command": {
+        "prefix": "\n>> ",
+        "style": "cyan",
+        "suffix": ".\n"
+      },
+      "task": {
+        "prefix": "\n",
+        "style": "underline"
+      },
+      "info": {},
+      "done": {
+        "prefix": "\n>> ",
+        "suffix": ".\n",
+        "style": "green"
+      },
+      "debug": {},
+      "warn": {
+        "prefix": "!! ",
+        "style": "yellow"
+      },
+      "error": {
+        "prefix": "!! ",
+        "style": "red"
+      }
     }
+  },
+  "dependencies": {
+    "async": "^1.4.2",
+    "chalk": "^1.1.0",
+    "finalhandler": "^0.4.0",
+    "fs-extra": "^0.24.0",
+    "fs-walk": "0.0.1",
+    "ftp": "^0.3.10",
+    "handlebars": "^3.0.3",
+    "highlight.js": "^8.7.0",
+    "less": "^2.5.1",
+    "marked": "^0.3.5",
+    "minimist": "^1.2.0",
+    "moment": "^2.10.6",
+    "nodegit": "^0.4.1",
+    "open": "0.0.5",
+    "path": "^0.11.14",
+    "prompt": "^0.2.14",
+    "q": "^1.4.1",
+    "querystring": "^0.2.0",
+    "serve-static": "^1.10.0",
+    "underscore": "^1.8.3"
+  }
 }
