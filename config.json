@@ -123,7 +123,10 @@
         "assetsDir": "/assets"
     },
     "theme": {
-        "main": "base.less"
+        "main": "base.less",
+        "options": {
+            "compress": false
+        }
     },
     "pages": {
         "home": {

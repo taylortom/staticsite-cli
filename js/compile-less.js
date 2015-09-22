@@ -8,7 +8,11 @@ var config = require('./config');
 module.exports = function compileLESS(args, cbCompiled) {
     fs.readFile(path.join(config._LESS_DIR,config.theme.main), "utf-8", function onRead(error, file) {
         if(error) return cbCompiled(error);
-        less.render(file, { paths: [ config._LESS_DIR ], compress: true }, function (error, output) {
+
+        var options = config.theme.options;
+        options.paths = [ config._LESS_DIR ];
+
+        less.render(file, options, function (error, output) {
             if(error) cbCompiled(error);
             fs.outputFile(path.join(config._OUTPUT_DIR, "theme.css"), output.css, cbCompiled);
         });
