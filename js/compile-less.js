@@ -1,5 +1,6 @@
 var fs = require('fs-extra');
 var less = require('less');
+var cleanCSS = require('less-plugin-clean-css');
 var path = require('path');
 var walk = require('fs-walk');
 
@@ -11,6 +12,12 @@ module.exports = function compileLESS(args, cbCompiled) {
 
         var options = config.theme.options;
         options.paths = [ config._LESS_DIR ];
+
+        if(options.compress === true) {
+            if(!options.plugins) options.plugins = [];
+            cleanCSSPlugin = new cleanCSS({ advanced: true });
+            options.plugins.push(cleanCSSPlugin);
+        }
 
         less.render(file, options, function (error, output) {
             if(error) cbCompiled(error);
