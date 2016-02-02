@@ -6,7 +6,8 @@ var config = require("../js/config");
 var logger = require("../js/logger");
 
 /*
-* Copy files/folders in _SRC_DIR not prefixed with _/. or blacklisted
+* @name copy
+* @description Copies files/folders in _SRC_DIR not prefixed with _ or . or blacklisted
 */
 module.exports = function copy(args, cbCopied) {
     var blacklist = [ "README.md" ];

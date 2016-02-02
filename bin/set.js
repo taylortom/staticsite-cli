@@ -2,7 +2,8 @@ var config = require("../js/config");
 var packageJSON = require("../package.json");
 
 /*
-* Set config options from the command line
+* @name set
+* @description Set config options from the command line
 */
 module.exports = function set(args, cbDone) {
     var toSet = args.slice(1);

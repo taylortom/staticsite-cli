@@ -4,6 +4,10 @@ var async = require("async");
 var compileLESS = require("../js/compile-less");
 var config = require("../js/config");
 
+/*
+* @name compile
+* @description Generates the static pages in the output folder
+*/
 module.exports = function compile(args, cbCompiled) {
     async.parallel([
         function(cbDone) { compilePages(args,cbDone); },

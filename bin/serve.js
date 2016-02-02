@@ -8,7 +8,8 @@ var config = require("../js/config");
 var logger = require("../js/logger");
 
 /*
-* Runs local server, and opens in browser
+* @name serve
+* @description Runs local server and opens in browser
 */
 module.exports = function serve(args) {
     var serve = serveStatic(config._OUTPUT_DIR);

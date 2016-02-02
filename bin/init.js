@@ -8,7 +8,8 @@ var config = require("../js/config");
 var logger = require("../js/logger");
 
 /*
-* Downloads the repos
+* @name init
+* @description Downloads the repos and readies the file system
 */
 module.exports = function init(args) {
     async.eachSeries(Object.keys(config.repos), function iterator(repo, cbDoneLoop) {
