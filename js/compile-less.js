@@ -20,7 +20,10 @@ module.exports = function compileLESS(args, cbCompiled) {
         }
 
         less.render(file, options, function (error, output) {
-            if(error) cbCompiled(error);
+            if(error) {
+                error.message = "Failed to render LESS. " + error.message + " (at " + error.filename + ")";
+                cbCompiled(error);
+            }
             fs.outputFile(path.join(config._OUTPUT_DIR, "theme.css"), output.css, cbCompiled);
         });
     });
