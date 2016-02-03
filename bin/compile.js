@@ -1,7 +1,7 @@
 var _ = require("underscore");
 var async = require("async");
 
-var compileLESS = require("../js/compile-less");
+var less = require("./less");
 var config = require("../js/config");
 
 /*
@@ -11,7 +11,7 @@ var config = require("../js/config");
 module.exports = function compile(args, cbCompiled) {
     async.parallel([
         function(cbDone) { compilePages(args,cbDone); },
-        function(cbDone) { compileLESS(args,cbDone); }
+        function(cbDone) { less(args,cbDone); }
     ], cbCompiled);
 };
 
