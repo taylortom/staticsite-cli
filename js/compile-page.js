@@ -109,12 +109,7 @@ Page.prototype.writePageDelegate = function(pageNo, cbPageWritten) {
     var outputDir = path.join(config._OUTPUT_DIR, nameDir, pageDir);
 
     // model data
-    var model = {};
-    model.title = this.title;
-    if(this.description && this.description.show) model.description = this.description.text;
-    model.pageModel = this;
-    model.page = pageNo;
-
+    var model = _.extend({ page: pageNo }, this);
     this.writePage(model, this.templateData.page, filename, outputDir, cbPageWritten);
 };
 
