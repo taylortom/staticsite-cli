@@ -7,7 +7,8 @@ var config = require("../js/config");
 var logger = require("../js/logger");
 
 /*
-* Uploads the tmp/site files to the specified server via FTP
+* @name upload
+* @description TODO: Uploads the tmp/site files to the specified server via FTP
 */
 module.exports = function upload(args, cbUploaded) {
     logger.task('Connecting to server');

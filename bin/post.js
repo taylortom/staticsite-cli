@@ -14,7 +14,8 @@ var logger = require("../js/logger");
 var utils = require("../js/utils");
 
 /*
-* Creates an empty post file, opens in editor
+* @name post
+* @description Creates an empty post file, opens in text editor by default or to open in browser, add --html
 */
 module.exports = function post(args, cbPosted) {
     logger.task('Creating new post.');
