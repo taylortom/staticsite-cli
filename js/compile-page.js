@@ -13,7 +13,13 @@ var Page = module.exports = function(id, data, args) {
     this.id = id
     this.type = "page";
     for(var key in data) this[key] = data[key];
-}
+};
+
+Page.prototype.getModel = function(customAttributes) {
+  return _.extend({
+    menu: config.menu
+  }, this, customAttributes);
+};
 
 Page.prototype.loadTemplates = function(cbTemplateLoaded) {
     this.templateData = {};
@@ -110,7 +116,9 @@ Page.prototype.writePageDelegate = function(pageNo, cbPageWritten) {
     var outputDir = path.join(config._OUTPUT_DIR, nameDir, pageDir);
 
     // model data
-    var model = _.extend({ page: pageNo }, this);
+    var model = this.getModel({
+      page: pageNo
+    });
     this.writePage(model, this.templateData.page, filename, outputDir, cbPageWritten);
 };
 

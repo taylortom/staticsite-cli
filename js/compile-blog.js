@@ -81,7 +81,7 @@ Blog.prototype.parseMetaData = function(mdData, postData) {
 };
 
 Page.prototype.writeArchive = function(cbArchiveWritten) {
-    var model = _.extend({}, this, {
+    var model = this.getModel({
       title: {
         text: this.pages.archive.title,
         show: true
@@ -94,7 +94,9 @@ Page.prototype.writeArchive = function(cbArchiveWritten) {
 
 Blog.prototype.writePosts = function(cbPostsWritten) {
     async.each(this.posts, _.bind(function iterator(post, cbDoneLoop) {
-        var model = _.extend({ postModel: post }, this);
+        var model = this.getModel({
+          postModel: post
+        });
         var outputDir = path.join(config._OUTPUT_DIR, this.rootDir, post.dir);
         this.writePage(model, this.templateData.pages.posts, "index.html", outputDir, cbDoneLoop);
     },this), cbPostsWritten);
@@ -103,7 +105,7 @@ Blog.prototype.writePosts = function(cbPostsWritten) {
 Blog.prototype.writeTags = function(cbTagsWritten) {
     this.getTagData(_.bind(function(error, tagData) {
         async.forEachOf(tagData, _.bind(function iterator(tag, key, cbDoneLoop) {
-            var model = _.extend({}, this, {
+            var model = this.getModel({
               title: {
                 text: this.pages.tags.title.replace("[TAG]", key),
                 show: true
