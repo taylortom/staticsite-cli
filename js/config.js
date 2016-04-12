@@ -7,23 +7,25 @@ var path = require("path");
 * Global configuration object, builds on the package.json and _config.json
 */
 var config = module.exports = {
-    _CLI_ROOT: path.dirname(require.main.filename)
+    _CLI_ROOT: path.join(path.dirname(require.main.filename))
 };
 
 config.set = module.exports.set = function(toSet) {
     for(var key in toSet)
         config[key] = toSet[key];
 
-    fs.writeFileSync(path.join(config._CLI_ROOT, 'config.json'), JSON.stringify(config, null, "    "));
+    // fs.writeFileSync(path.join(config._CLI_ROOT, 'config.json'), JSON.stringify(config, null, "    "));
 };
 
 (function init() {
         // CLI config
-        addConfigFile("../package.json");
+        addConfigFile(path.join(config._CLI_ROOT, "package.json"));
+
+        var siteSrc = path.sep + path.relative(process.env.HOME, config.siteSrc || path.join(config._CLI_ROOT, "src"));
 
         // directories
         config._OUTPUT_DIR = path.join(config._CLI_ROOT, "site");
-        config._SRC_DIR = config.siteSrc || path.join(config._CLI_ROOT, "src");
+        config._SRC_DIR = siteSrc;
         config._PAGES_DIR = path.join(config._SRC_DIR, "_pages");
         config._POSTS_DIR = path.join(config._SRC_DIR, "_posts");
         config._JS_DIR = path.join(config._SRC_DIR, "_js");
@@ -36,9 +38,12 @@ config.set = module.exports.set = function(toSet) {
         addConfigFile(path.join(config._SRC_DIR, "_config.json"));
 })();
 
-function addConfigFile(filename, cbAdded) {
+function addConfigFile(filePath, cbAdded) {
     try {
-        var fileJSON = require(filename);
+        var fileJSON = fs.readJsonSync(filePath, { throws: false });
         config.set(fileJSON);
-    } catch(e) { console.log("error: " + e); }
+    } catch(e) {
+        var error = new Error("Couldn't load config file: " + filePath + '.', e.message);
+        throw error;
+    }
 };
