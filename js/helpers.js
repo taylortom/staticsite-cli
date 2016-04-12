@@ -1,5 +1,5 @@
 var handlebars = require("handlebars");
-
+var logger = require("./logger");
 var utils = require("./utils");
 
 /**
@@ -7,7 +7,7 @@ var utils = require("./utils");
 */
 
 handlebars.registerHelper("log", function(value) {
-    logger.debug("hbs.log: " + value);
+    logger.debug("hbs.log: " + JSON.stringify(value, null, ' '));
 });
 
 handlebars.registerHelper("dateFormat", function(value) {
