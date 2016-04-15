@@ -25,6 +25,7 @@ function compilePages(args, cbCompiled) {
             _.bind(p.loadTemplates, p),
             _.bind(p.loadData, p)
         ], function(error) {
+            if(error) return cbDoneLoop(error);
             p.write(cbDoneLoop);
         });
     }, cbCompiled);
