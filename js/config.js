@@ -26,6 +26,7 @@ config.set = module.exports.set = function(toSet) {
         // directories
         config._OUTPUT_DIR = path.join(config._CLI_ROOT, "site");
         config._SRC_DIR = siteSrc;
+        config._DATA_DIR = path.join(siteSrc, '_data');
         config._PAGES_DIR = path.join(config._SRC_DIR, "_pages");
         config._POSTS_DIR = path.join(config._SRC_DIR, "_posts");
         config._JS_DIR = path.join(config._SRC_DIR, "_js");
@@ -35,7 +36,7 @@ config.set = module.exports.set = function(toSet) {
         config._POST_ASSETS_DIR = path.join(config._SRC_DIR, "assets");
 
         // Site config
-        addConfigFile(path.join(config._SRC_DIR, "_config.json"));
+        addConfigFile(path.join(config._DATA_DIR, "config.json"));
 })();
 
 function addConfigFile(filePath, cbAdded) {
