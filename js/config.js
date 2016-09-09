@@ -40,11 +40,10 @@ config.set = module.exports.set = function(toSet) {
 })();
 
 function addConfigFile(filePath, cbAdded) {
-    try {
-        var fileJSON = fs.readJsonSync(filePath, { throws: false });
-        config.set(fileJSON);
-    } catch(e) {
-        var error = new Error("Couldn't load config file: " + filePath + '.', e.message);
+    var fileJSON = fs.readJsonSync(filePath, { throws: false });
+    if(!fileJSON) {
+        var error = new Error("Couldn't load config file: " + filePath + '.');
         throw error;
     }
+    config.set(fileJSON);
 };
