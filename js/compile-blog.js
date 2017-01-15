@@ -26,13 +26,14 @@ Blog.prototype.getPosts = function(dir, cbGotPosts) {
         async.forEachOf(utils.fileFilter(files, { type: ".md" }), _.bind(function iterator(file, index, cbDoneLoop) {
             fs.readFile(path.join(dir, file), "utf-8", _.bind(function onRead(error, mdData) {
                 if(error) return cbGotPosts(error);
-
-                var postData = {};
-                try { this.parseMetaData(mdData, postData); }
-                catch(e) { logger.warn("Skipping " + logger.file(file) + ", invalid metadata"); }
-                postData.body = mdRenderer(mdData.replace(/.*}]/, ""));
-                posts.push(postData);
-
+                try {
+                  var postData = {};
+                  this.parseMetaData(mdData, postData);
+                  postData.body = mdRenderer(mdData.replace(/.*}]/, ""));
+                  posts.push(postData);
+                } catch(e) {
+                  logger.warn("Skipping " + logger.file(file) + ", invalid metadata (" + e + ")");
+                }
                 cbDoneLoop();
             }, this));
         }, this), function(error) {
@@ -71,12 +72,16 @@ Blog.prototype.parseMetaData = function(mdData, postData) {
     var metaReg = /(\[!META(\{.*\})\])/;
     var metaData = JSON.parse(mdData.match(metaReg)[2]);
     for(var key in metaData) postData[key] = metaData[key];
-
-    postData.published = new Date(metaData.published);
-
-    // add folder location for permalinks and writing posts later
-    var datePrefix = utils.formatDate(postData.published, "YYYY/MM/DD").replace(/\//g,path.sep);
-    postData.dir = path.join(datePrefix, postData.id + path.sep);
+    // validate
+    async.each(['id','title','published','tags'], function(field, cb) {
+      if(!metaData.hasOwnProperty(field)) throw new Error('Missing ' + field);
+      cb();
+    }, function() {
+      postData.published = new Date(metaData.published);
+      var datePrefix = utils.formatDate(postData.published, "YYYY/MM/DD").replace(/\//g,path.sep);
+      // add folder location for permalinks and writing posts later
+      postData.dir = path.join(datePrefix, postData.id + path.sep);
+    });
 };
 
 Page.prototype.writeArchive = function(cbArchiveWritten) {
