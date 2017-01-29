@@ -15,16 +15,16 @@ exports.formatDate = function(date,format) {
 
 exports.fileFilter = function(array, config) {
   return _.filter(array, function(filename) {
-      var match = true;
+    var match = true;
 
-      if(config.type) {
-        filetype = filename.slice(filename.lastIndexOf("."));
-        match = filetype === config.type;
-      }
-      if(config.hidden) {
-        match = filename[0] === ".";
-      }
+    if(config.type) {
+      filetype = filename.slice(filename.lastIndexOf("."));
+      match = filetype === config.type;
+    }
+    if(config.hidden) {
+      match = filename[0] === ".";
+    }
 
-      return match;
+    return match;
   });
 };

@@ -11,14 +11,10 @@ var copy = require("./copy");
 * @description Shortcut for clean + copy + compile
 */
 module.exports = function build(args, cbCompiled) {
-    clean(args, function(error) {
-        async.parallel([
-            function(done) {
-                compile(args, done);
-            },
-            function(done) {
-                copy(args, done);
-            }
-        ], cbCompiled);
-    });
+  clean(args, function(error) {
+    async.parallel([
+      function(done) { compile(args, done); },
+      function(done) { copy(args, done); }
+    ], cbCompiled);
+  });
 };

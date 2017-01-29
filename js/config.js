@@ -21,7 +21,8 @@ config.set = module.exports.set = function(toSet) {
         // CLI config
         addConfigFile(path.join(config._CLI_ROOT, "package.json"));
 
-        var siteSrc = path.sep + path.relative(process.env.HOME, config.siteSrc || path.join(config._CLI_ROOT, "src"));
+        // var siteSrc = path.sep + path.relative(process.env.HOME, config.siteSrc || path.join(config._CLI_ROOT, "src"));
+        var siteSrc = config.siteSrc || path.join(config._CLI_ROOT, "src");
 
         // directories
         config._OUTPUT_DIR = path.join(config._CLI_ROOT, "site");
