@@ -7,12 +7,15 @@ var path = require("path");
 
 var args = minimist(process.argv.slice(2));
 // set this globally so that config initialises properly
-if(args.dir && fs.existsSync(args.dir)) {
+if(args.dir) {
+  if(!fs.existsSync(args.dir)) {
+    console.log(`Source dir doesn't exist: '${args.dir}'`);
+    process.exit(1);
+  }
   process.env.SITE_SRC = args.dir;
 }
 var config = require("./js/config");
 var logger = require("./js/logger");
-
 
 // self-starter
 (function start() {
