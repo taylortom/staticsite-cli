@@ -24,9 +24,6 @@
     "container": "page.html",
     "page": "page.hbs"
   },
-  "testing": {
-    "serverPort": 8000
-  },
   "watch": {
     "less": "less",
     "hbs": "compile",

@@ -17,8 +17,11 @@ module.exports = function serve(args) {
     var done = finalhandler(req, res);
     serve(req, res, done);
   });
-  server.listen(config.testing.serverPort);
+  // use stored value, or get a value > 8000 && < 9000
+  var port = config.testing && config.testing.serverPort || Math.round(Math.random()*1000)+8000;
 
-  logger.task("Running localhost at " + logger.var(config._OUTPUT_DIR.replace(config._CLI_ROOT, "") + ":" + config.testing.serverPort));
-  open("http://localhost:" + config.testing.serverPort);
+  server.listen(port);
+
+  logger.task(`Running localhost at ${logger.var(config._OUTPUT_DIR.replace(config._CLI_ROOT, ""))}: ${port}`);
+  open("http://localhost:" + port);
 };
