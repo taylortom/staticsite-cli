@@ -22,6 +22,6 @@ module.exports = function serve(args) {
 
   server.listen(port);
 
-  logger.task(`Running localhost at ${logger.var(config._OUTPUT_DIR.replace(config._CLI_ROOT, ""))}: ${port}`);
+  logger.task(`Running localhost at ${logger.var(config._OUTPUT_DIR)}: ${port}`);
   open("http://localhost:" + port);
 };
