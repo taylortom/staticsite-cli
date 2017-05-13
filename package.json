@@ -1,25 +1,25 @@
 {
-  "name": "taylortom-cli",
-  "version": "0.0.1",
-  "description": "Command line interface for taylortom.co.uk.",
+  "name": "staticsite-cli",
+  "version": "1.0.0",
+  "description": "Node-based command line interface for generating static websites.",
   "preferGlobal": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/taylortom/taylortom-cli"
+    "url": "https://github.com/taylortom/staticsite-cli"
   },
   "keywords": [
     "taylortom"
   ],
-  "author": "Thomas Taylor <me@taylortom.co.uk>",
+  "author": "Thomas Taylor <hello@tomtaylor.name>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/taylortom/taylortom-cli/issues"
+    "url": "https://github.com/taylortom/staticsite-cli/issues"
   },
-  "homepage": "https://github.com/taylortom/taylortom-cli",
+  "homepage": "https://github.com/taylortom/staticsite-cli",
   "bin": {
-    "tt": "index.js"
+    "ss": "index.js"
   },
-  "siteSrc": "/Users/tom/Projects/taylortom-src",
+  "siteSrc": "/Users/tom/Projects/tomtaylor.name/main",
   "templateDefaults": {
     "container": "page.html",
     "page": "page.hbs"
