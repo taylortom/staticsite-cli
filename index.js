@@ -34,7 +34,7 @@ function processCommand() {
   try {
     var commandHandler = require(path.join(config._CLI_ROOT, "bin", command));
   } catch(e) {
-    return logger.error("'" + command + "' is not a valid command. See 'tt list' for help.");
+    return logger.error(`'${command}' is not a valid command. See '${Object.keys(config.bin)[0]} list' for help.`);
   }
 
   logger.command("Running " + command);
