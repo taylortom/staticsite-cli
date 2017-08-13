@@ -52,7 +52,7 @@ function welcome() {
 
 function listCommands(callback) {
   var columnify = require('columnify');
-  console.log("\nThe available commands are:");
+  console.log("\nThe available commands are:\n");
 
   var nameRE = /@name (.+)/;
   var descRE = /@description (.+)/;
@@ -86,7 +86,8 @@ function listCommands(callback) {
         maxWidth: 75-longestName,
         showHeaders: false,
         columnSplitter: '  '
-      }));
+      }) + '\n');
+      console.log(`${chalk.underline('TIP:')} to use src files other than those set in package.json, pass the path using ${chalk.blue('--dir')}\n`);
       callback();
     });
   });
