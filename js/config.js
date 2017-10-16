@@ -7,7 +7,7 @@ var path = require("path");
 * Global configuration object, builds on the package.json and _config.json
 */
 var config = module.exports = {
-  _CLI_ROOT: path.join(path.dirname(require.main.filename))
+  _CLI_ROOT: path.join(__dirname, '..')
 };
 
 config.set = module.exports.set = function(toSet) {
