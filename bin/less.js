@@ -28,7 +28,7 @@ module.exports = function less(args, cbCompiled) {
         error.message = `Failed to render LESS. ${error.message} (at ${error.filename})`;
         return cbCompiled(error);
       }
-      fs.outputFile(path.join(config._OUTPUT_DIR, "theme.css"), output.css, cbCompiled);
+      fs.outputFile(path.join(config._OUTPUT_DIR, 'css', "theme.css"), output.css, cbCompiled);
     });
   });
 };
