@@ -18,10 +18,10 @@ npm link
 
 Once installed, the tool can be accessed globally with
 ```
-tt
+ss
 ```
 
-### CLI commands
+### Commands
 
 Command | Description
 ------- | -----------
@@ -54,3 +54,86 @@ Folder       | Description
 `_pages`     | Individual `.md` files for each page.
 `_posts`     | Individual `.md` files for each blog post.
 `_templates` | Handlebars template files for the site pages. Main page wrapper taken from `page.html`.
+
+### Site configuration
+
+The `_data/config.json` is used to define the site structure. In here, you must define the pages you want to appear, as well as various other settings.
+
+The following attributes must appear for a site to be generated:
+
+#### globals
+
+This does something.
+
+```
+"globals": {
+	"assetsDir": "/assets"
+}
+```
+
+#### menu
+
+This object defines what's shown on the site's main navigation menu, and should be an array of objects with the form:
+```
+{
+	"id": "", // a unique value for this item
+	"html": "", // what's rendered on-screen
+	"url": "", // where to navigate on click
+	"target": "" // the anchor tag's target
+}
+```
+
+#### theme
+
+```
+"theme": {
+	"main": "base.less",
+	"options": {
+		"compress": true
+	}
+}
+```
+
+#### pages
+```
+"pages": {
+		"home": {
+				"title": {
+					"text": "Home",
+					"show": false
+				},
+				"description": {
+						"text": "You've stumbled across my blog: the home of my most private, innermost thoughts and reflections. And random cat videos.",
+						"show": true
+				},
+				"links": {
+						"Latest posts": "/blog",
+						"Archive": "/blog/archive"
+				},
+				"template": "blog.hbs",
+				"subDir": false
+		}
+```
+```
+"blog": {
+	"paginate": {
+		"pageSize": 10,
+		"pagedAttr": "posts"
+	},
+	"editor": "atom",
+	"pages": {
+		"posts": {
+			"template": "post.hbs"
+		},
+		"tags": {
+			"title": "Posts tagged with '[TAG]'",
+			"template": "tags.hbs"
+		},
+		"archive": {
+			"title": "The blog archives",
+			"description": "Here you'll find every post from my blog's distant past, so put your feet up, brush off the dust, and read at your own peril.",
+			"template": "archive.hbs"
+		}
+	}
+}
+```
