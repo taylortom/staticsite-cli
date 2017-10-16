@@ -19,6 +19,7 @@
   "bin": {
     "ss": "index.js"
   },
+  "main": "js/exports.js",
   "siteSrc": "/Users/tom/Projects/tomtaylor.name/main",
   "templateDefaults": {
     "container": "page.html",
