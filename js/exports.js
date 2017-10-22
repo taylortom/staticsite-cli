@@ -10,8 +10,9 @@ var exports = {};
     }
     if(args.dir && fs.existsSync(args.dir)) {
       process.env.SITE_SRC = args.dir;
-      // needed to make sure we're using the new src dir
-      require('./config').initialise();
+      var config = require('./config');
+      config.initialise(); // needed to make sure we're using the new src dir
+      config._CLI_MODE = false;
     }
     require(`../bin/${name}`)(args, cb);
   }

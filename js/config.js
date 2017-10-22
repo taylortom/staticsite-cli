@@ -8,6 +8,7 @@ var path = require("path");
 */
 var config = module.exports = {
   _CLI_ROOT: path.join(__dirname, '..'),
+  _CLI_MODE: true,
   initialise: function() {
     absorbConfigFile(path.join(config._CLI_ROOT, "package.json"));
     // determine site source: process.env > package.siteSrc > ROOT/src
