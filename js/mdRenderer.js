@@ -28,8 +28,8 @@ var replacements = {
 var renderer = new marked.Renderer();
 
 renderer.heading = function(text, level) {
-  return '<h5>' + text + '</h5>';
-  // return '<div class="heading h' + level + '">' + text + '</div>';
+  var tag = `h${level}`;
+  return `<${tag}>${text}</${tag}>`;
 };
 
 renderer.code = function(value) {
