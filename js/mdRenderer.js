@@ -33,19 +33,20 @@ renderer.heading = function(text, level) {
 };
 
 renderer.code = function(value) {
-  return '<div class="source_code" style="white-space: pre-wrap;">' + hl(value).value + '</div>';
+  return `<div class="source_code" style="white-space: pre-wrap;">${hl(value).value}</div>`;
 };
 
 renderer.codespan = function(value) {
-  return '<span class="source_code inline">' + value + '</span>';
+  return `<span class="source_code inline">${value}</span>`;
 };
 
 renderer.blockquote = function(value) {
-  return '<div class="blockquote">' + value + '</div>';
+  return `<div class="blockquote">${value}</div>`;
 };
 
 renderer.image = function(href, title, alt) {
-  return "<a href='" + href + "'><img class='media' title='" + title + "' alt='" + alt + "' src='" + href.replace(replacements.localFile.match, replacements.localFile.replace) + "' /></a>";
+  var src = href.replace(replacements.localFile.match, replacements.localFile.replace);
+  return `<a href="${href}"><img class='media' title="${title}" alt="${alt}" src="${src}" /></a>`;
 };
 
 // TODO this is only block-level
@@ -55,7 +56,7 @@ renderer.html = function(value) {
   //TODO allow for ' or "?
   switch(name) {
     case "youtube":
-      return "<div class='youtubeWrapper'><div class='inner'><iframe frameborder='0' allowfullscreen='' src='https://www.youtube.com/embed/" + value.match(/video-id="(.*)"/)[1] + "?rel=0&amp;showinfo=0' allowfullscreen></iframe></div></div>";
+      return `<div class='youtubeWrapper'><div class='inner'><iframe frameborder='0' allowfullscreen='' src='https://www.youtube.com/embed/${value.match(/video-id="(.*)"/)[1]}?rel=0&amp;showinfo=0' allowfullscreen></iframe></div></div>`;
     default:
       return value;
   }
