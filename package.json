@@ -95,6 +95,7 @@
     "ftp": "^0.3.10",
     "handlebars": "^3.0.3",
     "highlight.js": "^8.7.0",
+    "html2plaintext": "^1.1.1",
     "less": "^2.5.1",
     "less-plugin-clean-css": "^1.5.1",
     "marked": "^0.3.5",

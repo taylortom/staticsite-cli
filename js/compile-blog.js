@@ -1,6 +1,7 @@
 var _ = require("underscore");
 var async = require("async");
 var fs = require("fs-extra");
+var h2p = require('html2plaintext');
 var path = require("path");
 
 var Page = require("./compile-page");
@@ -119,6 +120,60 @@ Blog.prototype.writeTags = function(cbTagsWritten) {
   }, this));
 };
 
+Blog.prototype.writeFeed = function(cbFeedWritten) {
+  var noOfpages = Math.ceil(this.posts.length/this.feed.pageSize);
+  async.times(noOfpages, _.bind(this.writeFeedPage, this), function(error) {
+    if(!error) logger.debug("JSON blog Feed created");
+    cbFeedWritten(error);
+  });
+};
+
+Blog.prototype.writeFeedPage = function(pageNo, cbFeedPageWritten) {
+  var pageUrl = `${config.server.url}${this.rootDir}`;
+  var postPageData = this.getFeedPostData(pageNo);
+  var feed = {
+    version: "https://jsonfeed.org/version/1",
+    title: this.feed.title,
+    home_page_url: pageUrl,
+    feed_url: `${pageUrl}/feed.json`,
+    description: this.feed.description,
+    icon: this.feed.icon,
+    author: {
+      name: this.feed.author.name,
+      url: config.server.url,
+      avatar: this.feed.author.avatar
+    },
+    items: postPageData.posts
+  };
+  if(postPageData.nextPage) {
+    feed.next_url = `${pageUrl}/${postPageData.nextPage}`;
+  }
+  var filename = 'feed' + ((pageNo > 0) ? pageNo : '') + '.json';
+  fs.writeJson(path.join(config._OUTPUT_DIR, this.rootDir, filename), feed, cbFeedPageWritten);
+};
+
+Blog.prototype.getFeedPostData = function(pageNo) {
+  var startIndex = this.feed.pageSize*pageNo;
+  var endIndex = startIndex+this.feed.pageSize;
+  var posts = this.posts.slice(startIndex, endIndex).map(_.bind(function(post) {
+    return {
+      id: post.id,
+      url: `${config.server.url}${this.rootDir}/${post.dir}`,
+      title: post.title,
+      content_html: post.body,
+      content_text: h2p(post.body),
+      // TODO support summary
+      // summary: post.summary,
+      date_published: post.published,
+      tags: post.tags
+    };
+  }, this));
+  return {
+    posts: posts,
+    nextPage: (endIndex < this.posts.length) ? `feed${++pageNo}.json` : ''
+  }
+};
+
 /*
 * OVERRIDES START HERE...
 */
@@ -150,5 +205,12 @@ Blog.prototype.loadData = function(cbDataLoaded) {
       this.organisePosts();
       cbDataLoaded();
     }, this));
+  }, this));
+};
+
+Blog.prototype.write = function(cbWritten) {
+  Page.prototype.write.call(this, _.bind(function loadedData(error) {
+    if(error) return cbWritten(error);
+    this.writeFeed(cbWritten);
   }, this));
 };
