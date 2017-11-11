@@ -91,7 +91,6 @@
     "columnify": "^1.5.4",
     "finalhandler": "^0.4.0",
     "fs-extra": "^0.24.0",
-    "fs-walk": "0.0.1",
     "ftp": "^0.3.10",
     "handlebars": "^3.0.3",
     "highlight.js": "^8.7.0",

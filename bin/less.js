@@ -2,7 +2,6 @@ var fs = require('fs-extra');
 var cleanCSS = require('less-plugin-clean-css');
 var LESS = require('less');
 var path = require('path');
-var walk = require('fs-walk');
 
 var config = require('../js/config');
 
