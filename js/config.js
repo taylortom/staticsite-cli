@@ -12,7 +12,7 @@ var config = module.exports = {
   initialise: function() {
     absorbConfigFile(path.join(config._CLI_ROOT, "package.json"));
     // determine site source: process.env > package.siteSrc
-    var siteSrc = process.env.SITE_SRC || config.siteSrc;
+    var siteSrc = process.env.SITE_SRC || config.siteSrc || '';
     // directories
     config._OUTPUT_DIR = path.join(config._CLI_ROOT, "site");
     config._SRC_DIR = siteSrc;
