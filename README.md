@@ -67,7 +67,7 @@ This does something.
 
 ```
 "globals": {
-	"assetsDir": "/assets"
+  "assetsDir": "/assets"
 }
 ```
 
@@ -76,10 +76,10 @@ This does something.
 This object defines what's shown on the site's main navigation menu, and should be an array of objects with the form:
 ```
 {
-	"id": "", // a unique value for this item
-	"html": "", // what's rendered on-screen
-	"url": "", // where to navigate on click
-	"target": "" // the anchor tag's target
+  "id": "", // a unique value for this item
+  "html": "", // what's rendered on-screen
+  "url": "", // where to navigate on click
+  "target": "" // the anchor tag's target
 }
 ```
 
@@ -87,53 +87,54 @@ This object defines what's shown on the site's main navigation menu, and should 
 
 ```
 "theme": {
-	"main": "base.less",
-	"options": {
-		"compress": true
-	}
+  "main": "base.less",
+  "options": {
+    "compress": true
+  }
 }
 ```
 
 #### pages
 ```
 "pages": {
-		"home": {
-				"title": {
-					"text": "Home",
-					"show": false
-				},
-				"description": {
-						"text": "You've stumbled across my blog: the home of my most private, innermost thoughts and reflections. And random cat videos.",
-						"show": true
-				},
-				"links": {
-						"Latest posts": "/blog",
-						"Archive": "/blog/archive"
-				},
-				"template": "blog.hbs",
-				"subDir": false
-		}
+  "home": {
+    "title": {
+      "text": "Home",
+      "show": false
+    },
+    "description": {
+      "text": "You've stumbled across my blog: the home of my most private, innermost thoughts and reflections. And random cat videos.",
+      "show": true
+    },
+    "links": {
+      "Latest posts": "/blog",
+      "Archive": "/blog/archive"
+    },
+    "template": "blog.hbs",
+    "subDir": false
+  }
+}
 ```
 ```
 "blog": {
-	"paginate": {
-		"pageSize": 10,
-		"pagedAttr": "posts"
-	},
-	"editor": "atom",
-	"pages": {
-		"posts": {
-			"template": "post.hbs"
-		},
-		"tags": {
-			"title": "Posts tagged with '[TAG]'",
-			"template": "tags.hbs"
-		},
-		"archive": {
-			"title": "The blog archives",
-			"description": "Here you'll find every post from my blog's distant past, so put your feet up, brush off the dust, and read at your own peril.",
-			"template": "archive.hbs"
-		}
-	}
+  "paginate": {
+    "pageSize": 10,
+    "pagedAttr": "posts"
+  },
+  "editor": "atom",
+  "pages": {
+    "posts": {
+      "template": "post.hbs"
+    },
+    "tags": {
+      "title": "Posts tagged with '[TAG]'",
+      "template": "tags.hbs"
+    },
+    "archive": {
+      "title": "The blog archives",
+      "description": "Here you'll find every post from my blog's distant past, so put your feet up, brush off the dust, and read at your own peril.",
+      "template": "archive.hbs"
+    }
+  }
 }
 ```
