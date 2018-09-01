@@ -1,4 +1,4 @@
-var open = require("open");
+var opn = require("opn");
 
 var config = require("../js/config");
 var logger = require("../js/logger");
@@ -9,5 +9,5 @@ var logger = require("../js/logger");
 */
 module.exports = function launch(args) {
   logger.task("Navigating to " + logger.var(config.server.url));
-  open(config.server.url);
+  opn(config.server.url);
 };

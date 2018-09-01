@@ -1,6 +1,6 @@
 var finalhandler = require('finalhandler');
 var http = require("http");
-var open = require("open");
+var opn = require("opn");
 var path = require("path");
 var serveStatic = require('serve-static');
 
@@ -24,7 +24,7 @@ module.exports = function serve(args, done) {
   logger.task(`Running localhost at ${logger.var(config._OUTPUT_DIR)}: ${port}`);
   // let the calling code decide how to open the web page if consumed as module
   if(config._CLI_MODE) {
-    open("http://localhost:" + port);
+    opn("http://localhost:" + port);
   } else {
     done(null, { url: `http://localhost:${port}` });
   }
