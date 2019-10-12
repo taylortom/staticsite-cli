@@ -33,8 +33,7 @@ var config = module.exports = {
 
 function absorbConfigFile(filePath, cbAdded) {
   try {
-    var fileJSON = fs.readJsonSync(filePath, { throws: false });
-    config.set(fileJSON);
+    Object.assign(config, require(filePath));
   } catch(e) {
     console.error(new Error("Couldn't load config file: " + filePath + '.'));
   }
