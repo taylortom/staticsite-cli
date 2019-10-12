@@ -56,6 +56,7 @@ function listCommands(callback) {
 
   var nameRE = /@name (.+)/;
   var descRE = /@description (.+)/;
+  var argsRE = /@args (.+)/;
   var commands = {};
 
   var longestName = 0;
@@ -69,6 +70,7 @@ function listCommands(callback) {
 
         var name = contents.match(nameRE);
         var description = contents.match(descRE);
+        var argsDescription = contents.match(argsRE);
 
         if(!name || !description) {
           logger.warn('No task info found for ' + file);
@@ -76,7 +78,7 @@ function listCommands(callback) {
         }
         if(name[1].length > longestName) longestName = name[1].length;
 
-        commands[chalk.gray(name[1])] = description[1];
+        commands[chalk.gray(name[1])] = `${description[1]} ${args[1] && chalk.blue(args[1]) || ''}`;
         doneLoop();
       });
     }, function doneAll(error) {
