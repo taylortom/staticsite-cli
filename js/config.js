@@ -7,16 +7,15 @@ var path = require("path");
 * Global configuration object, builds on the package.json and _config.json
 */
 var config = module.exports = {
-  _CLI_ROOT: path.join(__dirname, '..'),
   _CLI_MODE: true,
+  _CLI_ROOT: path.join(__dirname, '..'),
+  _PROJECT_ROOT: path.join(process.cwd()),
   initialise: function() {
     absorbConfigFile(path.join(config._CLI_ROOT, "package.json"));
-    // determine site source: process.env > package.siteSrc
-    var siteSrc = process.env.SITE_SRC || config.siteSrc || '';
     // directories
-    config._OUTPUT_DIR = path.join(config._CLI_ROOT, "site");
-    config._SRC_DIR = siteSrc;
-    config._DATA_DIR = path.join(siteSrc, '_data');
+    config._SRC_DIR = process.env.SITE_SRC || config._PROJECT_ROOT;
+    config._OUTPUT_DIR = process.env.SITE_OUTPUT || path.join(config._PROJECT_ROOT, "_build");
+    config._DATA_DIR = path.join(config._SRC_DIR, '_data');
     config._PAGES_DIR = path.join(config._SRC_DIR, "_pages");
     config._POSTS_DIR = path.join(config._SRC_DIR, "_posts");
     config._JS_DIR = path.join(config._SRC_DIR, "_js");
