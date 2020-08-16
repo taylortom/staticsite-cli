@@ -97,7 +97,7 @@
     "html2plaintext": "2.0.1",
     "less": "3.8.1",
     "less-plugin-clean-css": "1.5.1",
-    "marked": "0.5.0",
+    "marked": "0.7.0",
     "minimist": "1.2.0",
     "moment": "2.22.2",
     "opn": "5.3.0",
