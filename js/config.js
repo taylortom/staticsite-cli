@@ -28,7 +28,7 @@ var config = module.exports = {
   }
 };
 
-function absorbConfigFile(filePath, cbAdded) {
+function absorbConfigFile(filePath) {
   try {
     Object.assign(config, require(filePath));
   } catch(e) {
