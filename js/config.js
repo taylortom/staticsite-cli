@@ -1,6 +1,3 @@
-var _ = require("underscore");
-var async = require("async");
-var fs = require("fs-extra");
 var path = require("path");
 
 /*
