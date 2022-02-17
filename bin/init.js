@@ -2,7 +2,6 @@ var async = require("async");
 var fs = require("fs");
 var nodegit = require("nodegit");
 var path = require("path");
-var Q = require("q");
 
 var config = require("../js/config");
 var logger = require("../js/logger");
@@ -14,8 +13,7 @@ var logger = require("../js/logger");
 module.exports = function init(args) {
   async.eachSeries(Object.keys(config.repos), function iterator(repo, cbDoneLoop) {
     fs.exists(path.join(config._TEMP_DIR, repo), function gotExists(exists) {
-      if(exists) {
-        // TODO update git repo
+      if(exists) { // TODO update git repo
         return cbDoneLoop();
       }
       logger.debug("Cloning", logger.file(repo));
@@ -24,23 +22,16 @@ module.exports = function init(args) {
         cbDoneLoop();
       }).catch(logger.error);
     });
-  }, function done() {
-      logger.done("website initialised");
-  });
+  }, () => logger.done("website initialised"));
 
-  function getRepo(name) {
-    var deferred = Q.defer();
-
-    if(!config.repos[name]) deferred.reject(new Error(`No config options for '${name}'`));
-
-    nodegit.Clone(config.repos[name], path.join(config._TEMP_DIR, name),{
+  async function getRepo(name) {
+    if(!config.repos[name]) {
+      throw new Error(`No config options for '${name}'`);
+    }
+    nodegit.Clone(config.repos[name], path.join(config._TEMP_DIR, name), {
       remoteCallbacks: {
-        certificateCheck: function() { return 1; },
-        credentials: function(url, userName) { return nodegit.Cred.sshKeyFromAgent(userName); }
-      }})
-      .then(deferred.resolve)
-      .catch(deferred.reject);
-
-    return deferred.promise;
+        certificateCheck: () => 1,
+        credentials: (url, userName) => nodegit.Cred.sshKeyFromAgent(userName)
+      }});
   }
 };
