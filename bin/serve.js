@@ -30,5 +30,4 @@ module.exports = function serve(args, done) {
     done(null, { url: `http://localhost:${port}` });
   }
   */
-  done(null, { url: `http://localhost:${port}` });
 };
