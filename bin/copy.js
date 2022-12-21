@@ -10,7 +10,7 @@ var logger = require("../js/logger");
 * @description Copies files/folders in _SRC_DIR not prefixed with _ or . or blacklisted
 */
 module.exports = function copy(args, cbCopied) {
-  var blacklist = [ "README.md" ];
+  var { blacklist } = require('../package.json');
 
   fs.readdir(config._SRC_DIR, function read(error, files) {
     if(error) return cbCopied(error);
