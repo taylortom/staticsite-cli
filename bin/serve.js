@@ -18,7 +18,7 @@ module.exports = function serve(args, done) {
     serve(req, res, done);
   });
   // use stored value, or get a value > 8000 && < 9000
-  var port = config.testing && config.testing.serverPort || Math.round(Math.random()*1000)+8000;
+  var port = config.server && config.server.port || config.testing && config.testing.serverPort || Math.round(Math.random()*1000)+8000;
 
   server.listen(port);
   logger.task(`Running localhost at ${logger.var(config._OUTPUT_DIR)}: ${port}`);
