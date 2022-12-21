@@ -22,10 +22,13 @@ module.exports = function serve(args, done) {
 
   server.listen(port);
   logger.task(`Running localhost at ${logger.var(config._OUTPUT_DIR)}: ${port}`);
+  /*
   // let the calling code decide how to open the web page if consumed as module
   if(config._CLI_MODE) {
     opn("http://localhost:" + port);
   } else {
     done(null, { url: `http://localhost:${port}` });
   }
+  */
+  done(null, { url: `http://localhost:${port}` });
 };
