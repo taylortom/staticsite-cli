@@ -14,6 +14,7 @@ var logger = require("../js/logger");
 module.exports = function serve(args, done) {
   var serve = serveStatic(config._OUTPUT_DIR);
   var server = http.createServer(function onRequest(req, res) {
+    console.log('onRequest:', req.originalUrl);
     var done = finalhandler(req, res);
     serve(req, res, done);
   });
