@@ -1,17 +1,14 @@
-var finalhandler = require('finalhandler');
-var http = require("http");
-var opn = require("opn");
-var path = require("path");
-var serveStatic = require('serve-static');
-
-var config = require("../js/config");
-var logger = require("../js/logger");
+import config from '../js/config';
+import finalhandler from 'finalhandler';
+import http from 'http';
+import logger from '../js/logger';
+import serveStatic from 'serve-static';
 
 /*
 * @name serve
 * @description Runs local server and opens in browser
 */
-module.exports = function serve(args, done) {
+export default function serve(args, done) {
   var serve = serveStatic(config._OUTPUT_DIR);
   var server = http.createServer(function onRequest(req, res) {
     console.log('onRequest:', req.originalUrl);
@@ -23,12 +20,4 @@ module.exports = function serve(args, done) {
 
   server.listen(port);
   logger.task(`Running localhost at ${logger.var(config._OUTPUT_DIR)}: ${port}`);
-  /*
-  // let the calling code decide how to open the web page if consumed as module
-  if(config._CLI_MODE) {
-    opn("http://localhost:" + port);
-  } else {
-    done(null, { url: `http://localhost:${port}` });
-  }
-  */
 };

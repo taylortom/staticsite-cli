@@ -1,14 +1,13 @@
-var _ = require("underscore");
-var async = require("async");
-
-var less = require("./less");
-var config = require("../js/config");
+import _ from 'underscore';
+import async from 'async';
+import config from '../js/config';
+import less from './less';
 
 /*
 * @name compile
 * @description Generates the static pages in the output folder
 */
-module.exports = function compile(args, cbCompiled) {
+export default function compile(args, cbCompiled) {
   async.parallel([
     function(cbDone) { compilePages(args,cbDone); },
     function(cbDone) { less(args,cbDone); }

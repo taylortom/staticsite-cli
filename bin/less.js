@@ -1,15 +1,14 @@
-var fs = require('fs-extra');
-var cleanCSS = require('less-plugin-clean-css');
-var LESS = require('less');
-var path = require('path');
-
-var config = require('../js/config');
+import fs from 'fs-extra';
+import cleanCss from 'less-plugin-clean-css';
+import config from '../js/config';
+import path from 'path';
+import { render as renderLess } from 'less';
 
 /*
 * @name less
 * @description Compiles the less to the output folder
 */
-module.exports = function less(args, cbCompiled) {
+export default function less(args, cbCompiled) {
   fs.readFile(path.join(config._LESS_DIR,config.theme.main), "utf-8", function onRead(error, file) {
     if(error) {
       return cbCompiled(error);
@@ -19,10 +18,10 @@ module.exports = function less(args, cbCompiled) {
 
     if(options.compress === true) {
       if(!options.plugins) options.plugins = [];
-      cleanCSSPlugin = new cleanCSS({ advanced: true });
+      cleanCSSPlugin = new cleanCss({ advanced: true });
       options.plugins.push(cleanCSSPlugin);
     }
-    LESS.render(file, options, function (error, output) {
+    renderLess(file, options, function (error, output) {
       if(error) {
         error.message = `Failed to render LESS. ${error.message} (at ${error.filename})`;
         return cbCompiled(error);

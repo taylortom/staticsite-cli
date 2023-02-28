@@ -1,6 +1,6 @@
-var handlebars = require("handlebars");
-var logger = require("./logger");
-var utils = require("./utils");
+import handlebars from 'handlebars';
+import logger from './logger';
+import utils from './utils';
 
 /**
 * handlebars helpers

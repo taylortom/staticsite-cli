@@ -1,16 +1,15 @@
-var _ = require("underscore");
-var async = require("async");
-var fs = require("fs-extra");
-var h2p = require('html2plaintext');
-var path = require("path");
+import _ from 'underscore';
+import async from 'async';
+import config from '../js/config';
+import fs from 'fs-extra';
+import h2p from 'html2plaintext';
+import logger from '../js/logger';
+import mdRenderer from '../js/mdRenderer';
+import Page from './compile-page';
+import path from 'path';
+import utils from '../js/utils';
 
-var Page = require("./compile-page");
-var config = require("../js/config");
-var logger = require("../js/logger");
-var mdRenderer = require("../js/mdRenderer");
-var utils = require("../js/utils");
-
-var Blog = module.exports = function(id, data, args) {
+var Blog = function(id, data, args) {
   Page.call(this, id, data);
   this.type = "blog";
   this.includeDrafts = args.drafts || args.d;
@@ -214,3 +213,5 @@ Blog.prototype.write = function(cbWritten) {
     this.writeFeed(cbWritten);
   }, this));
 };
+
+export default Blog;

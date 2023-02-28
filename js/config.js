@@ -1,11 +1,11 @@
-var path = require("path");
+import path from 'path';
 
 /*
 * Global configuration object, builds on the package.json and _config.json
 */
-var config = module.exports = {
-  _CLI_MODE: true,
-  _CLI_ROOT: path.join(__dirname, '..'),
+var config = {
+_CLI_MODE: true,
+_CLI_ROOT: path.join(__dirname, '..'),
   _PROJECT_ROOT: path.join(process.cwd()),
   initialise: function() {
     absorbConfigFile(path.join(config._CLI_ROOT, "package.json"));
@@ -37,3 +37,5 @@ function absorbConfigFile(filePath) {
 }
 
 config.initialise();
+
+export default config;

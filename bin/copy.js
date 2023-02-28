@@ -1,15 +1,14 @@
-var async = require("async");
-var fs = require("fs-extra");
-var path = require("path");
-
-var config = require("../js/config");
-var logger = require("../js/logger");
+import async from 'async';
+import config from '../js/config';
+import fs from 'fs-extra';
+import logger from '../js/logger';
+import path from 'path';
 
 /*
 * @name copy
 * @description Copies files/folders in _SRC_DIR not prefixed with _ or . or blacklisted
 */
-module.exports = function copy(args, cbCopied) {
+export default function copy(args, cbCopied) {
   var { blacklist } = require('../package.json');
 
   fs.readdir(config._SRC_DIR, function read(error, files) {

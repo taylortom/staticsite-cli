@@ -1,11 +1,10 @@
-var chalk = require("chalk");
-
-var config = require("./config");
+import chalk from 'chalk';
+import config from './config';
 
 /*
 * Various debugging shortcuts
 */
-var exports = module.exports = {};
+var exports = {};
 
 // string styling
 exports.file = function(value) { return chalk.magenta(value); };
@@ -35,3 +34,5 @@ exports.var  = function(value) { return '"' + value + '"'; };
   }
   if(!logConf.logFilters[logLevel]) exports.warn("debugging level '" + logLevel + "' not recognised, switching to 'normal'");
 })();
+
+export default exports;

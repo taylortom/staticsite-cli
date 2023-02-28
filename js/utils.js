@@ -1,11 +1,11 @@
-var _ = require("underscore");
-var logger = require("./logger");
-var moment = require("moment");
+import _ from 'underscore';
+import logger from './logger';
+import moment from 'moment';
 
 /*
 * various helper functions
 */
-var exports = module.exports = {};
+var exports = {};
 
 exports.formatDate = function(date,format) {
   var d = new Date(date);
@@ -28,3 +28,5 @@ exports.fileFilter = function(array, config) {
     return match;
   });
 };
+
+export default exports;

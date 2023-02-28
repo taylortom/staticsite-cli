@@ -1,9 +1,9 @@
 #! /usr/bin/env node
-var async = require("async");
-var chalk = require("chalk");
-var fs = require("fs");
-var minimist = require("minimist");
-var path = require("path");
+import async from 'async';
+import chalk from 'chalk';
+import fs from 'fs';
+import minimist from 'minimist';
+import path from 'path';
 
 var args = minimist(process.argv.slice(2));
 // set this globally so that config initialises properly

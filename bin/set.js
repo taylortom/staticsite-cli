@@ -1,11 +1,10 @@
-var config = require("../js/config");
-var packageJSON = require("../package.json");
+import config from '../js/config';
 
 /*
 * @name set
 * @description Sets config options from the command line
 */
-module.exports = function set(args, cbDone) {
+export default function set(args, cbDone) {
   // TODO does this work??
   var toSet = args.slice(1);
   config.set(args);

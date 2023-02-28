@@ -1,4 +1,4 @@
-var fs = require('fs');
+import fs from 'fs';
 
 var exports = {};
 
@@ -25,4 +25,4 @@ var exports = {};
   }
 });
 
-module.exports = exports;
+export default exports;

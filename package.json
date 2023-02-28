@@ -23,6 +23,7 @@
     "ss": "index.js"
   },
   "main": "js/exports.js",
+  "type": "module",
   "templateDefaults": {
     "container": "page.html",
     "page": "page.hbs"

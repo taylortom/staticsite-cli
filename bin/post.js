@@ -1,23 +1,22 @@
-var _ = require('underscore');
-var exec = require('child_process').exec;
-var finalhandler = require('finalhandler');
-var fs = require("fs");
-var http = require("http");
-var open = require("open");
-var path = require("path");
-var prompt = require("prompt");
-var qs = require('querystring');
-var serveStatic = require('serve-static');
-
-var config = require("../js/config");
-var logger = require("../js/logger");
-var utils = require("../js/utils");
+import _ from 'underscore';
+import config from '../js/config';
+import { exec } from 'child_process';
+import finalhandler from 'finalhandler';
+import fs from 'fs';
+import http from 'http';
+import logger from '../js/logger';
+import open from 'open';
+import path from 'path';
+import prompt from 'prompt';
+import qs from 'querystring';
+import serveStatic from 'serve-static';
+import utils from '../js/utils';
 
 /*
 * @name post
 * @description Creates an empty post file, opens in text editor by default or to open in browser, add --html
 */
-module.exports = function post(args, cbPosted) {
+export default function post(args, cbPosted) {
   logger.task('Creating new post.');
 
   if(args.html) htmlLaunch(cbPosted);

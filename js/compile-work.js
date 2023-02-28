@@ -1,13 +1,9 @@
-var _ = require("underscore");
-var async = require("async");
-var fs = require("fs-extra");
-var path = require("path");
+import config from '../js/config';
+import fs from 'fs-extra';
+import Page from './compile-page';
+import path from 'path';
 
-var Page = require("./compile-page");
-var config = require("../js/config");
-var logger = require("../js/logger");
-
-var Work = module.exports = function(id, data, args) {
+var Work = function(id, data, args) {
   Page.call(this, id, data);
   this.type = "work";
 };
@@ -20,14 +16,15 @@ Work.prototype.contructor = Work;
 */
 
 Work.prototype.loadData = function(cbDataLoaded) {
-  var self = this;
-  Page.prototype.loadData.call(this, _.bind(function loadedData(error) {
+  Page.prototype.loadData.call(this, error => {
     if(error) return cbDataLoaded(error);
     
-    fs.readJson(path.join(config._DATA_DIR, "projects.json"), function jsonLoaded(error, projectsJson) {
+    fs.readJson(path.join(config._DATA_DIR, "projects.json"), (error, projectsJson) => {
       if(error) return cbDataLoaded(error);
-      self.projects = projectsJson;
+      this.projects = projectsJson;
       cbDataLoaded();
     });
-  }, this));
+  });
 };
+
+export default Work;

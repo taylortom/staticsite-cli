@@ -1,14 +1,13 @@
-var fs = require("fs");
-var spawn = require('child_process').spawn;
-
-var config = require("../js/config");
-var logger = require("../js/logger");
+import config from '../js/config';
+import fs from 'fs';
+import logger from '../js/logger';
+import { spawn } from 'child_process';
 
 /*
 * @name watch
 * @description Watches for changes, and executes the relevant CLI command set in config.json
 */
-module.exports = function watch(args) {
+export default function watch(args) {
   var conf = config.watch;
 
   fs.watch(config.siteSrc, { recursive: true }, function onChanged(e, filename) {

@@ -1,10 +1,9 @@
-var async = require("async");
-var fs = require("fs");
-var ftp = require("ftp");
-var path = require("path");
-
-var config = require("../js/config");
-var logger = require("../js/logger");
+import async from 'async';
+import config from '../js/config';
+import fs from 'fs';
+import ftp from 'ftp';
+import logger from '../js/logger';
+import path from 'path';
 
 /*
 * @name upload
@@ -13,7 +12,7 @@ var logger = require("../js/logger");
 * NOTE: assumes uploads are intended for '/'. If this isn't the case, you may
 * want to create a specific FTP account with access only to the required dir
 */
-module.exports = function upload(args, cbUploaded) {
+export default function upload(args, cbUploaded) {
   logger.task('Connecting to server');
 
   var ftpConfig = {

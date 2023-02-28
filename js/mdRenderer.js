@@ -1,8 +1,7 @@
-var hl = require("highlight.js").highlightAuto;
-var marked = require("marked");
-var path = require("path");
-
-var config = require("./config");
+import config from './config';
+import hl from 'highlight.js").highlightAu';
+import marked from 'marked';
+import path from 'path';
 
 function imageReplace(s) {
   return s.replace('file://', `${config.globals.assetsDir}${path.sep}`);
@@ -10,7 +9,7 @@ function imageReplace(s) {
 /*
 * Takes markdown-formatted data, and converts to an HTML string.
 */
-module.exports = function render(text) {
+export default function render(text) {
   // overrides for the Marked HTML renderer
   marked.use({ 
     renderer: {

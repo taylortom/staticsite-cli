@@ -1,18 +1,16 @@
-var async = require("async");
-var config = require("../js/config");
-var logger = require("../js/logger");
-
-// sub-tasks
-var clean = require("./clean");
-var compile = require("./compile");
-var copy = require("./copy");
+import async from 'async';
+import clean from './clean';
+import compile from './compile';
+import config from '../js/config';
+import copy from './copy';
+import logger from '../js/logger';
 
 /*
 * @name build
 * @description Shortcut for clean + copy + compile
 * @args --dir: site source directory
 */
-module.exports = function build(args, cbCompiled) {
+export default function build(args, cbCompiled) {
   if(!config._SRC_DIR) {
     return cbCompiled(`Cannot build, no site source has been specified`);
   }

@@ -1,16 +1,15 @@
-var async = require("async");
-var fs = require("fs");
-var nodegit = require("nodegit");
-var path = require("path");
-
-var config = require("../js/config");
-var logger = require("../js/logger");
+import async from 'async';
+import config from '../js/config';
+import fs from 'fs';
+import logger from '../js/logger';
+import nodegit from 'nodegit';
+import path from 'path';
 
 /*
 * @name init
 * @description Downloads the repos and readies the file system
 */
-module.exports = function init(args) {
+export default function init(args) {
   async.eachSeries(Object.keys(config.repos), function iterator(repo, cbDoneLoop) {
     fs.exists(path.join(config._TEMP_DIR, repo), function gotExists(exists) {
       if(exists) { // TODO update git repo
