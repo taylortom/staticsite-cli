@@ -1,10 +1,10 @@
 import _ from 'underscore';
 import async from 'async';
-import config from '../js/config';
+import config from '../js/config.js';
 import fs from 'fs-extra';
 import handlebars from 'handlebars';
-import logger from '../js/logger';
-import mdRenderer from '../js/mdRenderer';
+import logger from '../js/logger.js';
+import mdRenderer from '../js/mdRenderer.js';
 import path from 'path';
 
 var Page = function(id, data, args) {

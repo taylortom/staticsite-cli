@@ -1,6 +1,6 @@
-import config from '../js/config';
+import config from '../js/config.js';
 import fs from 'fs-extra';
-import Page from './compile-page';
+import Page from './compile-page.js';
 import path from 'path';
 
 var Work = function(id, data, args) {

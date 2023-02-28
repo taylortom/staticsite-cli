@@ -1,13 +1,13 @@
 import _ from 'underscore';
 import async from 'async';
-import config from '../js/config';
+import config from '../js/config.js';
 import fs from 'fs-extra';
 import h2p from 'html2plaintext';
-import logger from '../js/logger';
-import mdRenderer from '../js/mdRenderer';
-import Page from './compile-page';
+import logger from '../js/logger.js';
+import mdRenderer from '../js/mdRenderer.js';
+import Page from './compile-page.js';
 import path from 'path';
-import utils from '../js/utils';
+import utils from '../js/utils.js';
 
 var Blog = function(id, data, args) {
   Page.call(this, id, data);

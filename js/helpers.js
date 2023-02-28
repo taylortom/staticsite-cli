@@ -1,6 +1,6 @@
 import handlebars from 'handlebars';
 import logger from './logger';
-import utils from './utils';
+import utils from './utils.js';
 
 /**
 * handlebars helpers

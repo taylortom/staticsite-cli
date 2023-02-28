@@ -1,5 +1,5 @@
-import config from './config';
-import hl from 'highlight.js").highlightAu';
+import config from './config.js';
+import { highlightAuto as hl } from 'highlight.js';
 import marked from 'marked';
 import path from 'path';
 

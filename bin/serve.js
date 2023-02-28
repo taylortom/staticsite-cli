@@ -1,7 +1,7 @@
-import config from '../js/config';
+import config from '../js/config.js';
 import finalhandler from 'finalhandler';
 import http from 'http';
-import logger from '../js/logger';
+import logger from '../js/logger.js';
 import serveStatic from 'serve-static';
 
 /*

@@ -1,4 +1,4 @@
-import config from '../js/config';
+import config from '../js/config.js';
 
 /*
 * @name set

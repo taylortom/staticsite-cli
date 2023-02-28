@@ -1,7 +1,7 @@
 import _ from 'underscore';
 import async from 'async';
-import config from '../js/config';
-import less from './less';
+import config from '../js/config.js';
+import less from './less.js';
 
 /*
 * @name compile

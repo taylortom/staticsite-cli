@@ -1,7 +1,9 @@
 #! /usr/bin/env node
 import async from 'async';
 import chalk from 'chalk';
+import config from './js/config.js';
 import fs from 'fs';
+import logger from './js/logger.js';
 import minimist from 'minimist';
 import path from 'path';
 
@@ -14,9 +16,6 @@ if(args.dir) {
   }
   process.env.SITE_SRC = args.dir;
 }
-var config = require("./js/config");
-var logger = require("./js/logger");
-
 // self-starter
 (function start() {
   welcome();

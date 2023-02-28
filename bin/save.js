@@ -1,5 +1,5 @@
-import config from '../js/config';
-import logger from '../js/logger';
+import config from '../js/config.js';
+import logger from '../js/logger.js';
 
 /*
 * @name save

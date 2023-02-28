@@ -1,7 +1,7 @@
 import async from 'async';
-import config from '../js/config';
+import config from '../js/config.js';
 import fs from 'fs-extra';
-import logger from '../js/logger';
+import logger from '../js/logger.js';
 import path from 'path';
 
 /*

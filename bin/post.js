@@ -1,16 +1,16 @@
 import _ from 'underscore';
-import config from '../js/config';
+import config from '../js/config.js';
 import { exec } from 'child_process';
 import finalhandler from 'finalhandler';
 import fs from 'fs';
 import http from 'http';
-import logger from '../js/logger';
+import logger from '../js/logger.js';
 import open from 'open';
 import path from 'path';
 import prompt from 'prompt';
 import qs from 'querystring';
 import serveStatic from 'serve-static';
-import utils from '../js/utils';
+import utils from '../js/utils.js';
 
 /*
 * @name post

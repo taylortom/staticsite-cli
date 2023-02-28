@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
 import cleanCss from 'less-plugin-clean-css';
-import config from '../js/config';
+import config from '../js/config.js';
 import path from 'path';
 import { render as renderLess } from 'less';
 

@@ -1,9 +1,9 @@
 import async from 'async';
 import clean from './clean';
-import compile from './compile';
-import config from '../js/config';
-import copy from './copy';
-import logger from '../js/logger';
+import compile from './compile.js';
+import config from '../js/config.js';
+import copy from './copy.js';
+import logger from '../js/logger.js';
 
 /*
 * @name build
