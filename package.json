@@ -1,6 +1,6 @@
 {
   "name": "staticsite-cli",
-  "version": "1.2.1",
+  "version": "1.3.1",
   "description": "Node-based command line interface for generating static websites.",
   "preferGlobal": true,
   "repository": {
@@ -90,6 +90,9 @@
         "style": "red"
       }
     }
+  },
+  "testing": {
+    "serverPort": 3333
   },
   "dependencies": {
     "async": "^2.6.4",
