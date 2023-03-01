@@ -1,5 +1,5 @@
 import handlebars from 'handlebars';
-import logger from './logger';
+import logger from './logger.js';
 import utils from './utils.js';
 
 /**
@@ -31,3 +31,5 @@ handlebars.registerHelper('ifCond', function(v1, v2, options) {
   if(v1 === v2) return options.fn(this);
   return options.inverse(this);
 });
+
+export default {};
