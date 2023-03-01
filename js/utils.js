@@ -1,5 +1,6 @@
 import logger from './logger.js';
 import moment from 'moment';
+import path from 'path';
 
 /*
 * various helper functions
@@ -12,15 +13,11 @@ const Utils = {
     return moment(d).format(format);
   },
   fileFilter: (array, config) => {
-    array.filter(f => {
-      var match = true;
-      if(config.type) {
-        match = filename.slice(filename.lastIndexOf(".")) === config.type;
-      }
-      if(config.hidden) {
-        match = filename[0] === ".";
-      }
-      return match;
+    return array.filter(f => {
+      return [
+        !config.hidden || f[0] !== ".",
+        !config.type || path.extname(f) === config.type
+      ].every(Boolean);
     });
   }
 };
