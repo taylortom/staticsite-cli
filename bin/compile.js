@@ -1,4 +1,3 @@
-import _ from 'underscore';
 import async from 'async';
 import config from '../js/config.js';
 import less from './less.js';
@@ -17,11 +16,10 @@ export default function compile(args, cbCompiled) {
 function compilePages(args, cbCompiled) {
   async.forEachOf(config.pages, function iterator(page, key, cbDoneLoop) {
     getPageModule(key, (e, Page) => {
-      console.log(Page);
       var p = new Page(key, page, args);
       async.parallel([
-        _.bind(p.loadTemplates, p),
-        _.bind(p.loadData, p)
+        p.loadTemplates.bind(p),
+        p.loadData.bind(p)
       ], function(error) {
         if(error) return cbDoneLoop(error);
         p.write(cbDoneLoop);
