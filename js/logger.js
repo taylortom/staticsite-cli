@@ -4,35 +4,26 @@ import config from './config.js';
 /*
 * Various debugging shortcuts
 */
-var exports = {};
-
-// string styling
-exports.file = function(value) { return chalk.magenta(value); };
-exports.var  = function(value) { return '"' + value + '"'; };
-
-/*
-* Sets up logging functions based on config data (e.g. exports.command = (below code))
-* If type of log isn't incl. in filter function will do nothing.
-* [this] set to  config data.
-*/
-// self-starter
-(function init() {
-  var logConf = config.logging;
-  var logLevel = logConf.filter;
-  var filter = logConf.logFilters[logLevel] || logConf.logFilters.normal;
-  for(var key in logConf.logTypes) {
-    if(filter[0] !== "*" && filter.indexOf(key) === -1) {
-      exports[key] = function() {};
-      continue;
+const Logger = {
+  log: ({ prefix = '', style, suffix = '' }, message) => {
+    console.log(prefix, chalk[style]?.(message) ?? message, suffix);
+  },
+  // string styling
+  file: value => chalk.magenta(value),
+  var: value => '"' + value + '"',
+  // sets up logging functions based on config data (e.g. logger.debug()).
+  initialise: () => {
+    var { level, logFilters, logTypes } = config.logging;
+    var filters = logFilters[level];
+    if(!filters) {
+      Logger.warn(`debugging level '${level}' not recognised, switching to 'normal'`);
+      filters = logFilters.normal;
     }
-    exports[key] = (function(message) {
-      var prefix = (this.prefix && this.prefix) || "";
-      var message = chalk[this.style] && chalk[this.style](message) || message;
-      var suffix = this.suffix || "";
-      console.log(prefix + message + suffix);
-    }).bind(logConf.logTypes[key]);
+    for(var key in logTypes) {
+      const enable = filters[0] === "*" || filters.includes(key);
+      Logger[key] = enable ? message => Logger.log(logTypes[key], message) : () => {};
+    }
   }
-  if(!logConf.logFilters[logLevel]) exports.warn("debugging level '" + logLevel + "' not recognised, switching to 'normal'");
-})();
+};
 
-export default exports;
+export default Logger;
