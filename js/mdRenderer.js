@@ -1,6 +1,6 @@
 import config from './config.js';
-import { highlightAuto as hl } from 'highlight.js';
-import marked from 'marked';
+import hl from 'highlight.js';
+import { marked } from 'marked';
 import path from 'path';
 
 function imageReplace(s) {
@@ -18,7 +18,7 @@ export default function render(text) {
         return `<${tag}>${value}</${tag}>`;
       },
       code(value) {
-        return `<div class="source_code" style="white-space: pre-wrap;">${hl(value).value}</div>`;
+        return `<div class="source_code" style="white-space: pre-wrap;">${hl.highlightAuto(value).value}</div>`;
       },
       codespan(value) {
         return `<span class="source_code inline">${value}</span>`;
