@@ -41,7 +41,7 @@
     "package-lock.json"
   ],
   "logging": {
-    "filter": "debug",
+    "level": "debug",
     "logFilters": {
       "debug": [
         "*"
