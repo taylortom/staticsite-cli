@@ -22,7 +22,7 @@ if(args.dir) {
   processCommand();
 })();
 
-function processCommand() {
+async function processCommand() {
   var command = args._[0];
 
   if(command === "list" || args.h || args.help) {
@@ -31,7 +31,7 @@ function processCommand() {
   }
 
   try {
-    var commandHandler = require(path.join(config._CLI_ROOT, "bin", command));
+    var { default: commandHandler } = await import(path.join(config._CLI_ROOT, "bin", command));
   } catch(e) {
     return logger.error(`'${command}' is not a valid command. See '${Object.keys(config.bin)[0]} list' for help.`);
   }
@@ -49,8 +49,8 @@ function welcome() {
   console.log(config.name + ": " + config.description + " (v" + config.version + ")");
 }
 
-function listCommands(callback) {
-  var columnify = require('columnify');
+async function listCommands(callback) {
+  var { default: columnify } = await import('columnify');
   console.log("\nThe available commands are:\n");
 
   var nameRE = /@name (.+)/;
