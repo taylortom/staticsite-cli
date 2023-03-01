@@ -38,6 +38,4 @@ function absorbConfigFile(filePath) {
   }
 }
 
-config.initialise();
-
 export default config;
