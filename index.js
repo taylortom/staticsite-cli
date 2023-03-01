@@ -18,6 +18,8 @@ if(args.dir) {
 }
 // self-starter
 (function start() {
+  config.initialise();
+  logger.initialise();
   welcome();
   processCommand();
 })();
