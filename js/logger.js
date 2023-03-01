@@ -5,8 +5,8 @@ import config from './config.js';
 * Various debugging shortcuts
 */
 const Logger = {
-  log: ({ prefix = '', style, suffix = '' }, message) => {
-    console.log(prefix, chalk[style]?.(message) ?? message, suffix);
+  log: ({ prefix = '', style, suffix = '' }) => {
+    return m => console.log(prefix, chalk[style]?.(m) ?? m, suffix);
   },
   // string styling
   file: value => chalk.magenta(value),
@@ -21,7 +21,7 @@ const Logger = {
     }
     for(var key in logTypes) {
       const enable = filters[0] === "*" || filters.includes(key);
-      Logger[key] = enable ? message => Logger.log(logTypes[key], message) : () => {};
+      Logger[key] = enable ?  Logger.log(logTypes[key]) : () => {};
     }
   }
 };
