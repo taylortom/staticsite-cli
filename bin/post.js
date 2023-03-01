@@ -1,11 +1,10 @@
-import _ from 'underscore';
 import config from '../js/config.js';
 import { exec } from 'child_process';
 import finalhandler from 'finalhandler';
 import fs from 'fs';
 import http from 'http';
 import logger from '../js/logger.js';
-import open from 'open';
+import opn from 'opn';
 import path from 'path';
 import prompt from 'prompt';
 import qs from 'querystring';
@@ -38,12 +37,13 @@ function cmdLaunch(cbDone) {
 
 function htmlLaunch(cbDone) {
   // set up local server
-  var server = http.createServer(function serverReady(req, res) {
+  var server = http.createServer((req, res) => {
+    console.log(req.method);
     switch(req.method) {
       case "GET":
         return handleGETRequest(req, res);
       case "POST":
-        return handlePOSTRequest(req, res);
+        handlePOSTRequest(req, res, cbDone);
       default:
         return handleUnsupportedRequest(req, res);
     }
@@ -51,15 +51,15 @@ function htmlLaunch(cbDone) {
   server.listen(config.testing.serverPort);
   // open in browser
   logger.info("Opening editor");
-  open("http://localhost:" + config.testing.serverPort + "/post.html");
+  opn("http://localhost:" + config.testing.serverPort + "/post.html");
 }
 
-handleGETRequest(req, res) {
+function handleGETRequest(req, res) {
   var serve = serveStatic(config._CLI_ROOT + "/editor");
   serve(req, res, finalhandler(req, res));
 }
 
-handlePOSTRequest(req, res) {
+function handlePOSTRequest(req, res, next) {
   var body = '';
   req.on('data', function(d) { body += d; });
   req.on('end', function() {
@@ -69,13 +69,11 @@ handlePOSTRequest(req, res) {
       var message = "Success!\n\nFile saved to " + fileDir
       res.writeHead(200, { "Content-Length": message.length });
       res.end(message);
-
-      cbDone();
     });
   });
 }
 
-handleUnsupportedRequest(req, res) {
+function handleUnsupportedRequest(req, res) {
   var message = `Method '${req.method}' not supported`;
   res.writeHead(404, { "Content-Length": message.length });
   res.end(message);
@@ -106,8 +104,7 @@ function formatRequestData(data) {
       id: generateID(data.title, published),
       title: data.title,
       published: published,
-      // ignore any empty tags
-      tags: data.tags.split(",").filter(function(element) { return !_.isEmpty(element); })
+      tags: data.tags.split(",").filter(Boolean)
     },
     body: data.body || ""
   };

@@ -6,17 +6,20 @@ $(function(){
 
   var required = [ "title", "body" ];
   var inputValid = function() {
+    let valid = true;
     for(var i = 0, count = required.length; i < count; i++) {
       var $input = $(".input[name=" + required[i] + "]");
       if($input.val() === "") {
         $input.addClass("warning");
+        valid = false;
       }
     }
-    return false;
+    return valid;
   };
 
   // submit form
-  $('form').submit(function(){
+  $('form').submit(function() {
+    storeTags();
     $.post($(this).attr('action'), $(this).serialize(), function(data, status){
       $('.input').val("");
       alert(data, status);
