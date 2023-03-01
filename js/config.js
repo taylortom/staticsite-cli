@@ -1,11 +1,13 @@
+import { fileURLToPath } from 'url';
+import fs from 'fs';
 import path from 'path';
 
 /*
 * Global configuration object, builds on the package.json and _config.json
 */
 var config = {
-_CLI_MODE: true,
-_CLI_ROOT: path.join(__dirname, '..'),
+  _CLI_MODE: true,
+  _CLI_ROOT: fileURLToPath(new URL('..', import.meta.url)),
   _PROJECT_ROOT: path.join(process.cwd()),
   initialise: function() {
     absorbConfigFile(path.join(config._CLI_ROOT, "package.json"));
@@ -30,9 +32,9 @@ _CLI_ROOT: path.join(__dirname, '..'),
 
 function absorbConfigFile(filePath) {
   try {
-    Object.assign(config, require(filePath));
+    Object.assign(config, JSON.parse(fs.readFileSync(filePath).toString()));
   } catch(e) {
-    console.error(new Error("Couldn't load config file: " + filePath + '.'));
+    console.error(new Error(`Couldn't load config file: "${filePath}.`), e.toString());
   }
 }
 
