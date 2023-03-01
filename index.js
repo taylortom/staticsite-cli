@@ -6,6 +6,7 @@ import fs from 'fs';
 import logger from './js/logger.js';
 import minimist from 'minimist';
 import path from 'path';
+import { pathToFileURL } from 'url';
 
 var args = minimist(process.argv.slice(2));
 // set this globally so that config initialises properly
@@ -33,7 +34,7 @@ async function processCommand() {
   }
 
   try {
-    var { default: commandHandler } = await import(path.join(config._CLI_ROOT, "bin", command));
+    var { default: commandHandler } = await import(pathToFileURL(path.join(config._CLI_ROOT, "bin", `${command}.js`)));
   } catch(e) {
     return logger.error(`'${command}' is not a valid command. See '${Object.keys(config.bin)[0]} list' for help.`);
   }
