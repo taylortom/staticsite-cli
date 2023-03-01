@@ -1,5 +1,5 @@
 import async from 'async';
-import clean from './clean';
+import clean from './clean.js';
 import compile from './compile.js';
 import config from '../js/config.js';
 import copy from './copy.js';
