@@ -36,7 +36,9 @@ async function processCommand() {
   try {
     var { default: commandHandler } = await import(pathToFileURL(path.join(config._CLI_ROOT, "bin", `${command}.js`)));
   } catch(e) {
-    return logger.error(`'${command}' is not a valid command. See '${Object.keys(config.bin)[0]} list' for help.`);
+    if(e.code === 'ENOENT') return logger.error(`'${command}' is not a valid command. See '${Object.keys(config.bin)[0]} list' for help.`);
+    logger.error(`Failed to load command '${command}'`);
+    console.trace(e);
   }
 
   logger.command("Running " + command);
