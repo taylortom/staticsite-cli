@@ -1,4 +1,3 @@
-import _ from 'underscore';
 import async from 'async';
 import config from '../js/config.js';
 import fs from 'fs-extra';
