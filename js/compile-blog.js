@@ -195,7 +195,6 @@ Blog.prototype.loadData = function(cbDataLoaded) {
         });
       },
     ], error => {
-      console.log(this.posts);
       if(error) cbDataLoaded(error);
       this.organisePosts();
       cbDataLoaded();
