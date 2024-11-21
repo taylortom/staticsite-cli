@@ -68,6 +68,7 @@ Page.prototype.loadData = function(cbDataLoaded) {
 Page.prototype.loadConfigData = function() {
   for(var key in config.globals) this[key] = config.globals[key];
   for(var key in config.pages[this.id]) this[key] = config.pages[this.id][key];
+  this.theme = config.theme;
 };
 
 Page.prototype.loadTextFile = function(filename, cbFileRead) {

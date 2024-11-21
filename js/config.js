@@ -24,6 +24,8 @@ var config = {
     config._POST_ASSETS_DIR = path.join(config._SRC_DIR, "assets");
     // Site config
     absorbConfigFile(path.join(config._DATA_DIR, "config.json"));
+    // set the theme data
+    config.theme = config.themes.find(t => t.name = config.theme)
   },
   set: function(toSet) {
     for(var key in toSet) config[key] = toSet[key];
