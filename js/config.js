@@ -24,8 +24,8 @@ var config = {
     config._POST_ASSETS_DIR = path.join(config._SRC_DIR, "assets");
     // Site config
     absorbConfigFile(path.join(config._DATA_DIR, "config.json"));
-    // set the theme data
-    config.theme = config.themes.find(t => t.name = config.theme)
+    // Theme settings
+    applyThemeSettings();
   },
   set: function(toSet) {
     for(var key in toSet) config[key] = toSet[key];
@@ -38,6 +38,17 @@ function absorbConfigFile(filePath) {
   } catch(e) {
     console.error(new Error(`Couldn't load config file: "${filePath}.`), e.toString());
   }
+}
+
+function applyThemeSettings() {
+  // Store theme settings 
+  config.theme = { // defaults
+    name: "default",
+    main: "base.less",
+    options: { compress: true }
+  };
+  var themeSettings = config.themes.find(t => t.name === config.theme) ?? {};
+  Object.assign(config.theme, themeSettings);
 }
 
 export default config;
