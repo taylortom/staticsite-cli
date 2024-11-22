@@ -1,4 +1,4 @@
-import fs from 'fs-extra';
+import fs from 'fs/promises';
 import config from '../js/config.js';
 import logger from '../js/logger.js';
 
@@ -6,9 +6,8 @@ import logger from '../js/logger.js';
 * @name clean
 * @description Removes everything in the output folder
 */
-export default function clean(args, cbCleaned) {
-  fs.emptyDir(config._OUTPUT_DIR, function removed(error) {
-    if(!error) logger.debug("Cleaned output directory");
-    cbCleaned(error);
-  });
+export default async function clean(args) {
+  await fs.rm(config._OUTPUT_DIR, { recursive: true });
+  await fs.mkdir(config._OUTPUT_DIR);
+  logger.debug("Cleaned output directory");
 };

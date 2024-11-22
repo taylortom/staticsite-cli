@@ -8,7 +8,7 @@ import serveStatic from 'serve-static';
 * @name serve
 * @description Runs local server and opens in browser
 */
-export default function serve(args, done) {
+export default function serve(args) {
   var port = config?.server?.port ?? config?.testing?.serverPort ?? Math.round(Math.random()*1000)+8000;
   http.createServer((req, res) => {
     serveStatic(config._OUTPUT_DIR)(req, res, finalhandler(req, res));

@@ -1,4 +1,3 @@
-import async from 'async';
 import config from '../js/config.js';
 import less from './less.js';
 
@@ -6,32 +5,28 @@ import less from './less.js';
 * @name compile
 * @description Generates the static pages in the output folder
 */
-export default function compile(args, cbCompiled) {
-  async.parallel([
-    function(cbDone) { compilePages(args,cbDone); },
-    function(cbDone) { less(args,cbDone); }
-  ], cbCompiled);
+export default async function compile(args) {
+  await Promise.all([
+    compilePages(args),
+    less(args)
+  ]);
 };
 
-function compilePages(args, cbCompiled) {
-  async.forEachOf(config.pages, function iterator(page, key, cbDoneLoop) {
-    getPageModule(key, (e, Page) => {
-      var p = new Page(key, page, args);
-      async.parallel([
-        p.loadTemplates.bind(p),
-        p.loadData.bind(p)
-      ], function(error) {
-        if(error) return cbDoneLoop(error);
-        p.write(cbDoneLoop);
-      });
-    })
-  }, cbCompiled);
+async function compilePages(args, cbCompiled) {
+  await Promise.all(Object.entries(config.pages).map(async ([key, page]) => {
+    const Page = await getPageModule(key, page, args)
+    const p = new Page(key, page, args);
+    return Promise.all([
+      p.loadTemplates(),
+      p.loadData()
+    ]);
+  }));
 }
 
-async function getPageModule(key, cbLoaded) {
+async function getPageModule(key) {
   // look for custom page first, then fall back to default
   let Page;
   try { Page = await import(`../js/compile-${key}.js`); }
   catch(e) { Page = await import('../js/compile-page.js'); }
-  cbLoaded(null, Page.default);
+  return Page.default;
 }

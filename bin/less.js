@@ -8,24 +8,18 @@ import less from 'less';
 * @name less
 * @description Compiles the less to the output folder
 */
-export default function(args, cbCompiled) {
-  fs.readFile(path.join(config._LESS_DIR,config.theme.main), "utf-8", function onRead(error, file) {
-    if(error) {
-      return cbCompiled(error);
-    }
-    var options = config.theme.options;
-    options.paths = [ config._LESS_DIR ];
-
-    if(options.compress === true) {
-      if(!options.plugins) options.plugins = [];
-      options.plugins.push(new cleanCss({ advanced: true }));
-    }
-    less.render(file, options, function (error, output) {
-      if(error) {
-        error.message = `Failed to render LESS. ${error.message} (at ${error.filename})`;
-        return cbCompiled(error);
-      }
-      fs.outputFile(path.join(config._OUTPUT_DIR, 'css', "theme.css"), output.css, cbCompiled);
-    });
-  });
+export default async function(args) {
+  const file = await fs.readFile(path.join(config._LESS_DIR,config.theme.main), "utf-8");
+  const options = Object.assign({ paths: [config._LESS_DIR] }, config.theme.options);
+  if(options.compress === true) {
+    if(!options.plugins) options.plugins = [];
+    options.plugins.push(new cleanCss({ advanced: true }));
+  }
+  try {
+    const output = await less.render(file, options);
+    fs.outputFile(path.join(config._OUTPUT_DIR, 'css', "theme.css"), output.css, cbCompiled);
+  } catch(e) {
+    e.message = `Failed to render LESS. ${e.message} (at ${e.filename})`;
+    throw e;
+  }
 };

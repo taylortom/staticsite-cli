@@ -95,7 +95,6 @@
     "serverPort": 3333
   },
   "dependencies": {
-    "async": "^2.6.4",
     "chalk": "2.4.1",
     "columnify": "1.5.4",
     "finalhandler": "1.1.1",

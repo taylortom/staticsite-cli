@@ -1,4 +1,3 @@
-import async from 'async';
 import clean from './clean.js';
 import compile from './compile.js';
 import config from '../js/config.js';
@@ -10,15 +9,12 @@ import logger from '../js/logger.js';
 * @description Shortcut for clean + copy + compile
 * @args --dir: site source directory
 */
-export default function build(args, cbCompiled) {
+export default async function build(args) {
   if(!config._SRC_DIR) {
-    return cbCompiled(`Cannot build, no site source has been specified`);
+    throw new Error(`Cannot build, no site source has been specified`);
   }
-  clean(args, function(error) {
-    logger.info(`Using src at ${config._SRC_DIR}`);
-    async.parallel([
-      function(done) { compile(args, done); },
-      function(done) { copy(args, done); }
-    ], cbCompiled);
-  });
+  await clean(args);
+  logger.info(`Using src at ${config._SRC_DIR}`);
+  await compile(args);
+  await copy(args);
 };
