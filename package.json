@@ -104,7 +104,7 @@
     "handlebars": "^4.7.7",
     "highlight.js": "^11.4.0",
     "html2plaintext": "^2.1.4",
-    "less": "3.8.1",
+    "less": "4.2.1",
     "less-plugin-clean-css": "github:less/less-plugin-clean-css",
     "marked": "^4.0.12",
     "minimist": "^1.2.5",
