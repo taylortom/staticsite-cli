@@ -1,7 +1,7 @@
 import config from '../js/config.js';
 import fs from 'fs/promises';
-import handlebars from 'handlebars';
-import helpers from './helpers.js'; // initialises hbs helpers
+import { compile } from './template.js';
+import './helpers.js';
 import logger from '../js/logger.js';
 import mdRenderer from '../js/mdRenderer.js';
 import path from 'path';
@@ -103,8 +103,8 @@ Page.prototype.writeSubPages = async function() {
 };
 
 Page.prototype.writePage = async function(model, template, filename, outputDir) {
-  var hbsTemplate = handlebars.compile(this.templateData.containerPage.replace("[PAGE_CONTENT]", template));
-  var html = hbsTemplate(model);
+  var tmpl = compile(this.templateData.containerPage.replace("[PAGE_CONTENT]", template));
+  var html = tmpl(model);
   await fs.mkdir(outputDir, { recursive: true });
 
   var filepath = path.join(outputDir, filename);
