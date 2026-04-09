@@ -100,11 +100,11 @@
     "finalhandler": "1.1.1",
     "handlebars": "^4.7.7",
     "highlight.js": "^11.4.0",
-    "less": "4.2.2",
+    "less": "4.6.4",
     "marked": "^4.0.12",
     "minimist": "^1.2.5",
     "open": "^10.0.0",
     "prompts": "^2.4.0",
-    "serve-static": "1.13.2"
+    "serve-static": "1.16.0"
   }
 }
