@@ -1,5 +1,5 @@
 import config from '../js/config.js';
-import fs from 'fs-extra';
+import fs from 'fs/promises';
 import Page from './compile-page.js';
 import path from 'path';
 
@@ -15,16 +15,10 @@ Work.prototype.contructor = Work;
 * OVERRIDES START HERE...
 */
 
-Work.prototype.loadData = function(cbDataLoaded) {
-  Page.prototype.loadData.call(this, error => {
-    if(error) return cbDataLoaded(error);
-    
-    fs.readJson(path.join(config._DATA_DIR, "projects.json"), (error, projectsJson) => {
-      if(error) return cbDataLoaded(error);
-      this.projects = projectsJson;
-      cbDataLoaded();
-    });
-  });
+Work.prototype.loadData = async function() {
+  await Page.prototype.loadData.call(this);
+  const data = await fs.readFile(path.join(config._DATA_DIR, "projects.json"), 'utf-8');
+  this.projects = JSON.parse(data);
 };
 
 export default Work;

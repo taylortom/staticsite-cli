@@ -1,8 +1,8 @@
 #! /usr/bin/env node
-import async from 'async';
 import chalk from 'chalk';
 import config from './js/config.js';
-import fs from 'fs';
+import { existsSync } from 'fs';
+import fs from 'fs/promises';
 import logger from './js/logger.js';
 import minimist from 'minimist';
 import path from 'path';
@@ -11,7 +11,7 @@ import { pathToFileURL } from 'url';
 var args = minimist(process.argv.slice(2));
 // set this globally so that config initialises properly
 if(args.dir) {
-  if(!fs.existsSync(args.dir)) {
+  if(!existsSync(args.dir)) {
     console.log(`Source dir doesn't exist: '${args.dir}'`);
     process.exit(1);
   }
@@ -29,7 +29,8 @@ async function processCommand() {
   var command = args._[0];
 
   if(command === "list" || args.h || args.help) {
-    listCommands(process.exit);
+    await listCommands();
+    process.exit();
     return;
   }
 
@@ -42,59 +43,49 @@ async function processCommand() {
   }
 
   logger.command("Running " + command);
-  commandHandler(args, function finishedCommand(error, data) {
-    if(error) logger.error(error);
-    else logger.done("Finished " + command);
-    // make sure we close properly
-    process.exit();
-  });
+
+  try {
+    await commandHandler(args);
+    logger.done("Finished " + command);
+  } catch(error) {
+    logger.error(error);
+  }
+  process.exit();
 }
 
 function welcome() {
   console.log(config.name + ": " + config.description + " (v" + config.version + ")");
 }
 
-async function listCommands(callback) {
-  var { default: columnify } = await import('columnify');
-  console.log("\nThe available commands are:\n");
-
+async function listCommands() {
   var nameRE = /@name (.+)/;
   var descRE = /@description (.+)/;
   var argsRE = /@args (.+)/;
-  var commands = {};
 
+  const files = await fs.readdir(path.join(config._CLI_ROOT, "bin"));
+  var commands = [];
   var longestName = 0;
 
-  fs.readdir(path.join(config._CLI_ROOT, "bin"), function onRead(error, files) {
-    if(error) return logger.error(error)
+  for (const file of files) {
+    const contents = await fs.readFile(path.join(config._CLI_ROOT, "bin", file), 'utf-8');
+    var name = contents.match(nameRE);
+    var description = contents.match(descRE);
+    var argsDescription = contents.match(argsRE);
 
-    async.each(files, function loop(file, doneLoop) {
-      fs.readFile(path.join(config._CLI_ROOT, "bin", file), { encoding: "utf8" }, function onFileRead(error, contents) {
-        if(error) return doneLoop(error);
+    if(!name || !description) {
+      logger.warn('No task info found for ' + file);
+      continue;
+    }
+    if(name[1].length > longestName) longestName = name[1].length;
+    commands.push({ name: name[1], description: description[1], args: argsDescription?.[1] });
+  }
 
-        var name = contents.match(nameRE);
-        var description = contents.match(descRE);
-        var argsDescription = contents.match(argsRE);
-
-        if(!name || !description) {
-          logger.warn('No task info found for ' + file);
-          return doneLoop();
-        }
-        if(name[1].length > longestName) longestName = name[1].length;
-
-        commands[chalk.gray(name[1])] = `${description[1]} ${args[1] && chalk.blue(args[1]) || ''}`;
-        doneLoop();
-      });
-    }, function doneAll(error) {
-      if(error) logger.error(error);
-
-      console.log(columnify(commands, {
-        maxWidth: 75-longestName,
-        showHeaders: false,
-        columnSplitter: '  '
-      }) + '\n');
-      console.log(`${chalk.underline('TIP:')} to use src files other than those set in package.json, pass the path using ${chalk.blue('--dir')}\n`);
-      callback();
-    });
-  });
+  console.log("\nThe available commands are:\n");
+  for (const cmd of commands) {
+    const paddedName = chalk.gray(cmd.name.padEnd(longestName + 2));
+    const desc = cmd.args ? `${cmd.description} ${chalk.blue(cmd.args)}` : cmd.description;
+    console.log(`${paddedName}${desc}`);
+  }
+  console.log();
+  console.log(`${chalk.underline('TIP:')} to use src files other than those set in package.json, pass the path using ${chalk.blue('--dir')}\n`);
 }
