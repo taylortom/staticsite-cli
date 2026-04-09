@@ -1,12 +1,12 @@
 import config from '../js/config.js';
 import logger from '../js/logger.js';
-import opn from 'opn';
+import open from 'open';
 
 /*
 * @name launch
 * @description Opens site in browser
 */
-export default function launch(args) {
+export default async function launch(args) {
   logger.task("Navigating to " + logger.var(config.server.url));
-  opn(config.server.url);
+  await open(config.server.url);
 };

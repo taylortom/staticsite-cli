@@ -1,13 +1,12 @@
 import config from '../js/config.js';
 import { exec } from 'child_process';
 import finalhandler from 'finalhandler';
-import fs from 'fs';
+import fs from 'fs/promises';
 import http from 'http';
 import logger from '../js/logger.js';
-import opn from 'opn';
+import open from 'open';
 import path from 'path';
-import prompt from 'prompt';
-import qs from 'querystring';
+import prompts from 'prompts';
 import serveStatic from 'serve-static';
 import utils from '../js/utils.js';
 
@@ -15,43 +14,33 @@ import utils from '../js/utils.js';
 * @name post
 * @description Creates an empty post file, opens in text editor by default or to open in browser, add --html
 */
-export default function post(args, cbPosted) {
+export default async function post(args) {
   logger.task('Creating new post.');
 
-  if(args.html) htmlLaunch(cbPosted);
-  else cmdLaunch(cbPosted);
+  if (args.html) await htmlLaunch();
+  else await cmdLaunch();
 };
 
-// TODO waterfall
-function cmdLaunch(cbDone) {
-  getMetadata(function gotMeta(error, meta) {
-    if(error) return cbDone(error);
+async function cmdLaunch() {
+  const meta = await getMetadata();
+  const dir = await writeFile(meta);
+  await openEditor(dir);
+}
 
-    writeFile(meta, function(error, dir) {
-      if(error) return logger.error(error);
-
-      openEditor(dir, cbDone);
-    });
-  });
-};
-
-function htmlLaunch(cbDone) {
-  // set up local server
+async function htmlLaunch() {
   var server = http.createServer((req, res) => {
-    console.log(req.method);
-    switch(req.method) {
+    switch (req.method) {
       case "GET":
         return handleGETRequest(req, res);
       case "POST":
-        handlePOSTRequest(req, res, cbDone);
+        return handlePOSTRequest(req, res);
       default:
         return handleUnsupportedRequest(req, res);
     }
   });
   server.listen(config.testing.serverPort);
-  // open in browser
   logger.info("Opening editor");
-  opn("http://localhost:" + config.testing.serverPort + "/post.html");
+  await open("http://localhost:" + config.testing.serverPort + "/post.html");
 }
 
 function handleGETRequest(req, res) {
@@ -59,17 +48,17 @@ function handleGETRequest(req, res) {
   serve(req, res, finalhandler(req, res));
 }
 
-function handlePOSTRequest(req, res, next) {
+function handlePOSTRequest(req, res) {
   var body = '';
   req.on('data', function(d) { body += d; });
-  req.on('end', function() {
-    writeFile(formatRequestData(qs.parse(body)), function(error, fileDir) {
-      logger.info("written file " + logger.file(fileDir.replace(config._POSTS_DIR,"")));
+  req.on('end', async function() {
+    const params = Object.fromEntries(new URLSearchParams(body));
+    const fileDir = await writeFile(formatRequestData(params));
+    logger.info("written file " + logger.file(fileDir.replace(config._POSTS_DIR, "")));
 
-      var message = "Success!\n\nFile saved to " + fileDir
-      res.writeHead(200, { "Content-Length": message.length });
-      res.end(message);
-    });
+    var message = "Success!\n\nFile saved to " + fileDir;
+    res.writeHead(200, { "Content-Length": message.length });
+    res.end(message);
   });
 }
 
@@ -79,24 +68,19 @@ function handleUnsupportedRequest(req, res) {
   res.end(message);
 }
 
-function getMetadata(cbGotMeta) {
-  prompt.get({
-    properties: {
-      title: { message: 'Title' },
-      tags: { message: 'Tags (comma separated, no spaces)' }
-    }
-  }, function gotInput(error, result) {
-    if (error) return cbGotMeta(error);
-    cbGotMeta(null, formatRequestData(result));
-  });
+async function getMetadata() {
+  const result = await prompts([
+    { type: 'text', name: 'title', message: 'Title' },
+    { type: 'text', name: 'tags', message: 'Tags (comma separated, no spaces)' }
+  ]);
+  return formatRequestData(result);
 }
 
 function generateID(title, published) {
-  return utils.formatDate(published, "YYYYMMDD") + "-" + title.replace(/ /g,"-").toLowerCase();
+  return utils.formatDate(published, "YYYYMMDD") + "-" + title.replace(/ /g, "-").toLowerCase();
 }
 
 function formatRequestData(data) {
-  // no whitespace here please
   data.title = data.title.trim();
   var published = new Date();
   return {
@@ -110,15 +94,18 @@ function formatRequestData(data) {
   };
 }
 
-// save results to file (with meta wrapping)
-function writeFile(fileData, cbFileWritten) {
+async function writeFile(fileData) {
   var newPostPath = path.join(config._POSTS_DIR, fileData.meta.id + ".md");
-  fs.writeFile(newPostPath, `[!META${JSON.stringify(fileData.meta)}]\n\n` + fileData.body, function(error) {
-    cbFileWritten(error, newPostPath);
-  });
+  await fs.writeFile(newPostPath, `[!META${JSON.stringify(fileData.meta)}]\n\n` + fileData.body);
+  return newPostPath;
 }
 
-function openEditor(fileDir, cbOpenedEditor) {
-  logger.info("Launching " + logger.var(config.pages.blog.editor));
-  exec(config.pages.blog.editor + " " + fileDir, cbOpenedEditor);
+function openEditor(fileDir) {
+  return new Promise((resolve, reject) => {
+    logger.info("Launching " + logger.var(config.pages.blog.editor));
+    exec(config.pages.blog.editor + " " + fileDir, (error) => {
+      if (error) reject(error);
+      else resolve();
+    });
+  });
 }

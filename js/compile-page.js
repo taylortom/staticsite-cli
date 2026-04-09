@@ -1,6 +1,5 @@
-import async from 'async';
 import config from '../js/config.js';
-import fs from 'fs-extra';
+import fs from 'fs/promises';
 import handlebars from 'handlebars';
 import helpers from './helpers.js'; // initialises hbs helpers
 import logger from '../js/logger.js';
@@ -17,52 +16,45 @@ Page.prototype.getModel = function(customAttributes) {
   return { menu: config.menu, ...this, ...customAttributes };
 };
 
-Page.prototype.loadTemplates = function(cbTemplateLoaded) {
+Page.prototype.loadTemplates = async function() {
   this.templateData = {};
-  async.parallel([
-    this.loadContainer.bind(this),
-    this.loadPage.bind(this),
-    this.loadSubPages.bind(this),
-  ], cbTemplateLoaded);
+  await Promise.all([
+    this.loadContainer(),
+    this.loadPage(),
+    this.loadSubPages(),
+  ]);
 };
 
-Page.prototype.loadContainer = function(cbLoaded) {
-  this.loadTextFile(path.join(config._TEMPLATES_DIR, config.templateDefaults.container), function fileRead(error, data) {
-    this.templateData.containerPage = data;
-    cbLoaded(error);
-  });
+Page.prototype.loadContainer = async function() {
+  this.templateData.containerPage = await fs.readFile(
+    path.join(config._TEMPLATES_DIR, config.templateDefaults.container), 'utf-8'
+  );
 };
 
-Page.prototype.loadPage = function(cbLoaded) {
+Page.prototype.loadPage = async function() {
   var pageTemplate = this.template || config.templateDefaults.page;
-  this.loadTextFile(path.join(config._TEMPLATES_DIR, pageTemplate), (error, data) => {
-    this.templateData.page = data;
-    cbLoaded(error);
-  });
+  this.templateData.page = await fs.readFile(
+    path.join(config._TEMPLATES_DIR, pageTemplate), 'utf-8'
+  );
 };
 
-Page.prototype.loadSubPages = function(cbLoaded) {
+Page.prototype.loadSubPages = async function() {
   this.templateData.pages = {};
-  async.forEachOf(this.pages, (page, name, cbDoneLoop) => {
+  for (const [name, page] of Object.entries(this.pages || {})) {
     var pageTemplate = page.template || config.templateDefaults.page;
-    this.loadTextFile(path.join(config._TEMPLATES_DIR, pageTemplate), (error, data) => {
-      this.templateData.pages[name] = data;
-      cbDoneLoop(error);
-    });
-  }, cbLoaded);
+    this.templateData.pages[name] = await fs.readFile(
+      path.join(config._TEMPLATES_DIR, pageTemplate), 'utf-8'
+    );
+  }
 };
 
-Page.prototype.loadData = function(cbDataLoaded) {
+Page.prototype.loadData = async function() {
   this.loadConfigData();
 
-  if(this.type !== "page") {
-    return cbDataLoaded();
-  }
-  this.loadMarkdownData(path.join(config._PAGES_DIR, this.id + ".md"), (error, mdData) => {
-    if(error) return cbDataLoaded(error);
-    this.body = mdData;
-    cbDataLoaded();
-  });
+  if(this.type !== "page") return;
+
+  const data = await fs.readFile(path.join(config._PAGES_DIR, this.id + ".md"), 'utf-8');
+  this.body = mdRenderer(data);
 };
 
 Page.prototype.loadConfigData = function() {
@@ -71,70 +63,53 @@ Page.prototype.loadConfigData = function() {
   this.theme = config.theme;
 };
 
-Page.prototype.loadTextFile = function(filename, cbFileRead) {
-  fs.readFile(filename, "utf-8", cbFileRead.bind(this));
+Page.prototype.write = async function() {
+  await Promise.all([
+    this.writePages(),
+    this.writeSubPages()
+  ]);
 };
 
-Page.prototype.loadMarkdownData = function(filename, cbMarkdownLoaded) {
-  this.loadTextFile(filename, function fileRead(error,data) {
-    if(error) return cbMarkdownLoaded(error);
-    cbMarkdownLoaded(null, mdRenderer(data));
-  });
-};
-
-Page.prototype.write = function(cbWritten) {
-  async.parallel([
-    this.writePages.bind(this),
-    this.writeSubPages.bind(this)
-  ], cbWritten);
-};
-
-Page.prototype.writePages = function(cbPageWritten) {
+Page.prototype.writePages = async function() {
   if(!this.paginate) {
-    this.writePageDelegate(1, cbPageWritten);
+    await this.writePageDelegate(1);
     return;
   }
   var pagedAttr = this[this.paginate.pagedAttr];
   var currPage = -1;
 
-  async.each(pagedAttr, (item, cbDoneLoop) => {
-    if(item.page === currPage) return cbDoneLoop();
-
+  for (const item of pagedAttr) {
+    if(item.page === currPage) continue;
     currPage = item.page;
-    this.writePageDelegate(currPage, cbDoneLoop);
-
-  }, cbPageWritten);
+    await this.writePageDelegate(currPage);
+  }
 };
 
-Page.prototype.writePageDelegate = function(pageNo, cbPageWritten) {
+Page.prototype.writePageDelegate = async function(pageNo) {
     var nameDir = (this.subDir === true) ? this.id : "";
     var pageDir = (pageNo > 1) ? "page" + (pageNo) : "";
     var filename = this.index || "index.html";
     var outputDir = path.join(config._OUTPUT_DIR, nameDir, pageDir);
     // model data
     var model = this.getModel({ page: pageNo });
-    this.writePage(model, this.templateData.page, filename, outputDir, cbPageWritten);
+    await this.writePage(model, this.templateData.page, filename, outputDir);
 };
 
-Page.prototype.writeSubPages = function(cbPageWritten) {
-  async.forEachOf(this.pages, (page, name, cbDoneLoop) => {
+Page.prototype.writeSubPages = async function() {
+  for (const [name] of Object.entries(this.pages || {})) {
     var funcName = "write" + name[0].toUpperCase() + name.slice(1);
-    if(this[funcName]) this[funcName].call(this, cbDoneLoop);
-  }, cbPageWritten);
+    if(this[funcName]) await this[funcName]();
+  }
 };
 
-Page.prototype.writePage = function(model, template, filename, outputDir, cbPageWritten) {
+Page.prototype.writePage = async function(model, template, filename, outputDir) {
   var hbsTemplate = handlebars.compile(this.templateData.containerPage.replace("[PAGE_CONTENT]", template));
   var html = hbsTemplate(model);
-  fs.mkdirp(outputDir, error => {
-    if (error) return cbPageWritten(error);
+  await fs.mkdir(outputDir, { recursive: true });
 
-    var filepath = path.join(outputDir, filename);
-    fs.writeFile(filepath, html, error => {
-      if(!error) logger.debug("Created " + logger.file(filepath.replace(config._OUTPUT_DIR + path.sep,"")));
-      cbPageWritten(error);
-    });
-  });
+  var filepath = path.join(outputDir, filename);
+  await fs.writeFile(filepath, html);
+  logger.debug("Created " + logger.file(filepath.replace(config._OUTPUT_DIR + path.sep,"")));
 };
 
 export default Page;

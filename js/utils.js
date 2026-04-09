@@ -1,5 +1,5 @@
+import dayjs from 'dayjs';
 import logger from './logger.js';
-import moment from 'moment';
 import path from 'path';
 
 /*
@@ -10,7 +10,7 @@ const Utils = {
   formatDate: (date,format) => {
     var d = new Date(date);
     if(isNaN(d.getTime())) logger.error(`utils.formatDate: Invalid date passed: '${date}'`);
-    return moment(d).format(format);
+    return dayjs(d).format(format);
   },
   fileFilter: (array, config) => {
     return array.filter(f => {

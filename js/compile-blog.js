@@ -1,7 +1,5 @@
-import async from 'async';
 import config from '../js/config.js';
-import fs from 'fs-extra';
-import h2p from 'html2plaintext';
+import fs from 'fs/promises';
 import logger from '../js/logger.js';
 import mdRenderer from '../js/mdRenderer.js';
 import Page from './compile-page.js';
@@ -18,25 +16,23 @@ Blog.prototype = Object.create(Page.prototype);
 Blog.prototype.contructor = Blog;
 
 // load all .md posts
-Blog.prototype.getPosts = function(dir, cbGotPosts) {
-  fs.readdir(dir, (error, files) => {
-    if(error || files.length === 0) return cbGotPosts(error);
-    var posts = [];
-    async.forEachOf(utils.fileFilter(files, { type: ".md" }), (file, index, cbDoneLoop) => {
-      fs.readFile(path.join(dir, file), "utf-8", (error, mdData) => {
-        if(error) return cbGotPosts(error);
-        try {
-          var postData = {};
-          this.parseMetaData(mdData, postData);
-          postData.body = mdRenderer(mdData.replace(/.*}]/, ""));
-          posts.push(postData);
-        } catch(e) {
-          logger.warn("Skipping " + logger.file(file) + ", invalid metadata (" + e + ")");
-        }
-        cbDoneLoop();
-      });
-    }, error => cbGotPosts(error, posts));
-  });
+Blog.prototype.getPosts = async function(dir) {
+  const files = await fs.readdir(dir);
+  if(files.length === 0) return [];
+
+  var posts = [];
+  for (const file of utils.fileFilter(files, { type: ".md" })) {
+    const mdData = await fs.readFile(path.join(dir, file), 'utf-8');
+    try {
+      var postData = {};
+      this.parseMetaData(mdData, postData);
+      postData.body = mdRenderer(mdData.replace(/.*}]/, ""));
+      posts.push(postData);
+    } catch(e) {
+      logger.warn("Skipping " + logger.file(file) + ", invalid metadata (" + e + ")");
+    }
+  }
+  return posts;
 };
 
 // sorts and assigns page numbers
@@ -51,34 +47,32 @@ Blog.prototype.organisePosts = function() {
   }
 };
 
-Blog.prototype.getTagData = function(cbGotTagData) {
+Blog.prototype.getTagData = function() {
   var sorted = {};
-  async.each(this.posts, (post, cbDoneLoop) => {
-    async.each(post.tags, (tag, cbDoneLoop2) => {
+  for (const post of this.posts) {
+    for (const tag of post.tags) {
       if(!sorted[tag]) sorted[tag] = [ post ];
       else sorted[tag].push(post);
-      cbDoneLoop2();
-    }, cbDoneLoop);
-  }, e => cbGotTagData(e, sorted));
+    }
+  }
+  return sorted;
 };
 
 Blog.prototype.parseMetaData = function(mdData, postData) {
   var metaReg = /(\[!META(\{.*\})\])/;
   var metaData = JSON.parse(mdData.match(metaReg)[2]);
   for(var key in metaData) postData[key] = metaData[key];
-  // validate
-  async.each(['id','title','published','tags'], (field, cb) => {
+
+  for (const field of ['id','title','published','tags']) {
     if(!metaData.hasOwnProperty(field)) throw new Error('Missing ' + field);
-    cb();
-  }, () => {
-    postData.published = new Date(metaData.published);
-    var datePrefix = utils.formatDate(postData.published, "YYYY/MM/DD").replace(/\//g,path.sep);
-    // add folder location for permalinks and writing posts later
-    postData.dir = path.join(datePrefix, postData.id + path.sep);
-  });
+  }
+  postData.published = new Date(metaData.published);
+  var datePrefix = utils.formatDate(postData.published, "YYYY/MM/DD").replace(/\//g,path.sep);
+  // add folder location for permalinks and writing posts later
+  postData.dir = path.join(datePrefix, postData.id + path.sep);
 };
 
-Page.prototype.writeArchive = function(cbArchiveWritten) {
+Page.prototype.writeArchive = async function() {
   var model = this.getModel({
     title: {
       text: this.pages.archive.title,
@@ -87,42 +81,41 @@ Page.prototype.writeArchive = function(cbArchiveWritten) {
     description: this.pages.archive.description
   });
   var outputDir = path.join(config._OUTPUT_DIR, this.rootDir, "archive");
-  this.writePage(model, this.templateData.pages.archive, "index.html", outputDir, cbArchiveWritten);
+  await this.writePage(model, this.templateData.pages.archive, "index.html", outputDir);
 };
 
-Blog.prototype.writePosts = function(cbPostsWritten) {
-  async.each(this.posts, (post, cbDoneLoop) => {
+Blog.prototype.writePosts = async function() {
+  for (const post of this.posts) {
     var model = this.getModel({ postModel: post });
     var outputDir = path.join(config._OUTPUT_DIR, this.rootDir, post.dir);
-    this.writePage(model, this.templateData.pages.posts, "index.html", outputDir, cbDoneLoop);
-  }, cbPostsWritten);
+    await this.writePage(model, this.templateData.pages.posts, "index.html", outputDir);
+  }
 };
 
-Blog.prototype.writeTags = function(cbTagsWritten) {
-  this.getTagData((error, tagData) => {
-    async.forEachOf(tagData, (tag, key, cbDoneLoop) => {
-      var model = this.getModel({
-        title: {
-          text: this.pages.tags.title.replace("[TAG]", key),
-          show: true
-        },
-        tagData: tag
-      });
-      var outputDir = path.join(config._OUTPUT_DIR, this.rootDir, key);
-      this.writePage(model, this.templateData.pages.tags, "index.html", outputDir, cbDoneLoop);
-    }, cbTagsWritten);
-  });
+Blog.prototype.writeTags = async function() {
+  const tagData = this.getTagData();
+  for (const [key, tag] of Object.entries(tagData)) {
+    var model = this.getModel({
+      title: {
+        text: this.pages.tags.title.replace("[TAG]", key),
+        show: true
+      },
+      tagData: tag
+    });
+    var outputDir = path.join(config._OUTPUT_DIR, this.rootDir, key);
+    await this.writePage(model, this.templateData.pages.tags, "index.html", outputDir);
+  }
 };
 
-Blog.prototype.writeFeed = function(cbFeedWritten) {
+Blog.prototype.writeFeed = async function() {
   var noOfpages = Math.ceil(this.posts.length/this.feed.pageSize);
-  async.times(noOfpages, this.writeFeedPage.bind(this), function(error) {
-    if(!error) logger.debug("JSON blog Feed created");
-    cbFeedWritten(error);
-  });
+  for (let i = 0; i < noOfpages; i++) {
+    await this.writeFeedPage(i);
+  }
+  logger.debug("JSON blog Feed created");
 };
 
-Blog.prototype.writeFeedPage = function(pageNo, cbFeedPageWritten) {
+Blog.prototype.writeFeedPage = async function(pageNo) {
   var pageUrl = `${config.server.url}${this.rootDir}`;
   var postPageData = this.getFeedPostData(pageNo);
   var feed = {
@@ -143,7 +136,7 @@ Blog.prototype.writeFeedPage = function(pageNo, cbFeedPageWritten) {
     feed.next_url = `${pageUrl}/${postPageData.nextPage}`;
   }
   var filename = 'feed' + ((pageNo > 0) ? pageNo : '') + '.json';
-  fs.writeJson(path.join(config._OUTPUT_DIR, this.rootDir, filename), feed, cbFeedPageWritten);
+  await fs.writeFile(path.join(config._OUTPUT_DIR, this.rootDir, filename), JSON.stringify(feed));
 };
 
 Blog.prototype.getFeedPostData = function(pageNo) {
@@ -155,7 +148,7 @@ Blog.prototype.getFeedPostData = function(pageNo) {
       url: `${config.server.url}${this.rootDir}/${post.dir}`,
       title: post.title,
       content_html: post.body,
-      content_text: h2p(post.body),
+      content_text: post.body.replace(/<[^>]*>/g, ''),
       // TODO support summary
       // summary: post.summary,
       date_published: post.published,
@@ -172,41 +165,24 @@ Blog.prototype.getFeedPostData = function(pageNo) {
 * OVERRIDES START HERE...
 */
 
-Blog.prototype.loadData = function(cbDataLoaded) {
-  Page.prototype.loadData.call(this, error => {
-    if(error) return cbDataLoaded(error);
-    this.rootDir = path.sep + this.id;
-    this.posts = [];
-    //  TODO refactor this
-    async.parallel([
-      cbDone => {
-        this.getPosts(config._POSTS_DIR, (error, postData) => {
-          if(error) return cbDone(error);
-          this.posts = this.posts.concat(postData);
-          cbDone();
-        });
-      },
-      (cbDone) => {
-        if(!this.includeDrafts) return cbDone();
-        this.getPosts(config._DRAFTS_DIR, (error, postData) => {
-          if(error) return cbDone(error);
-          this.posts = this.posts.concat(postData);
-          cbDone();
-        });
-      },
-    ], error => {
-      if(error) cbDataLoaded(error);
-      this.organisePosts();
-      cbDataLoaded();
-    });
-  });
+Blog.prototype.loadData = async function() {
+  await Page.prototype.loadData.call(this);
+  this.rootDir = path.sep + this.id;
+  this.posts = [];
+
+  const postData = await this.getPosts(config._POSTS_DIR);
+  this.posts = this.posts.concat(postData);
+
+  if(this.includeDrafts) {
+    const draftData = await this.getPosts(config._DRAFTS_DIR);
+    this.posts = this.posts.concat(draftData);
+  }
+  this.organisePosts();
 };
 
-Blog.prototype.write = function(cbWritten) {
-  Page.prototype.write.call(this, error => {
-    if(error) return cbWritten(error);
-    this.writeFeed(cbWritten);
-  });
+Blog.prototype.write = async function() {
+  await Page.prototype.write.call(this);
+  await this.writeFeed();
 };
 
 export default Blog;
