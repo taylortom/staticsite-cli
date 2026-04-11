@@ -26,11 +26,11 @@
   "type": "module",
   "templateDefaults": {
     "container": "page.html",
-    "page": "page.hbs"
+    "page": "default.html"
   },
   "watch": {
     "less": "less",
-    "hbs": "compile",
+    "html": "compile",
     "js": "compile",
     "json": "compile",
     "md": "compile"
