@@ -1,6 +1,7 @@
 import config from './config.js';
 import hl from 'highlight.js';
 import { marked } from 'marked';
+import markedFootnote from 'marked-footnote';
 import path from 'path';
 
 function imageReplace(s) {
@@ -11,6 +12,7 @@ function imageReplace(s) {
 */
 export default function render(text) {
   // overrides for the Marked HTML renderer
+  marked.use(markedFootnote());
   marked.use({
     renderer: {
       code({ text }) {
