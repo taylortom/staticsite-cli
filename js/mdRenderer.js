@@ -43,5 +43,49 @@ export default function render(text) {
     }
   });
   text = imageReplace(text);
-  return marked.parse(text);
+  text = processFootnotes(text);
+  var result = text.footnotes ? marked.parse(text.body) + text.footnotes : marked.parse(text);
+  return result;
 };
+
+/*
+* Extracts footnote definitions and references from markdown text.
+* Returns the modified text string if no footnotes are found, or an object
+* { body, footnotes } if footnotes are present.
+*/
+function processFootnotes(text) {
+  // Collect all footnote definitions: [^label]: text (with optional indented continuation)
+  var footnoteMap = {};
+  var fnDefRegex = /^\[\^([^\]]+)\]:([ \t]+)([\s\S]*?)(?=\n\[\^|\n\n(?!\s)|\n$|$)/gm;
+  var match;
+  while ((match = fnDefRegex.exec(text)) !== null) {
+    var label = match[1];
+    // Trim indented continuation lines and collapse to a single string
+    var body = match[3].replace(/\n {4}/g, '\n').trim();
+    footnoteMap[label] = body;
+  }
+  if (Object.keys(footnoteMap).length === 0) return text;
+
+  // Remove footnote definitions from text
+  text = text.replace(/^\[\^[^\]]+\]:[ \t]+[\s\S]*?(?=\n\[\^|\n\n(?!\s)|\n$|$)/gm, '');
+
+  // Replace inline footnote references with numbered superscript links
+  var footnoteOrder = [];
+  text = text.replace(/\[\^([^\]]+)\]/g, function(full, label) {
+    if (!footnoteOrder.includes(label)) footnoteOrder.push(label);
+    var num = footnoteOrder.indexOf(label) + 1;
+    return `<sup id="fnref${num}"><a href="#fn${num}">${num}</a></sup>`;
+  });
+
+  // Build the footnotes HTML block
+  var footnotesHtml = '<div class="footnotes"><ol>';
+  for (var i = 0; i < footnoteOrder.length; i++) {
+    var fnLabel = footnoteOrder[i];
+    var num = i + 1;
+    var fnText = footnoteMap[fnLabel] || '';
+    footnotesHtml += `<li id="fn${num}">${fnText} <a href="#fnref${num}">&#8617;</a></li>`;
+  }
+  footnotesHtml += '</ol></div>';
+
+  return { body: text, footnotes: footnotesHtml };
+}
