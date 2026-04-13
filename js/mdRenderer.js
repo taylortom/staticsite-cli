@@ -52,8 +52,11 @@ export default function render(text) {
 * Extracts footnote definitions and references from markdown text.
 * Returns the modified text string if no footnotes are found, or an object
 * { body, footnotes } if footnotes are present.
+* Note: footnote text is authored content (not untrusted user input) so it is
+* not HTML-escaped, consistent with the rest of the markdown renderer pipeline.
 */
 function processFootnotes(text) {
+  var INDENT_SPACES = 4; // standard markdown continuation indent
   // Collect all footnote definitions: [^label]: text (with optional indented continuation)
   var footnoteMap = {};
   var fnDefRegex = /^\[\^([^\]]+)\]:([ \t]+)([\s\S]*?)(?=\n\[\^|\n\n(?!\s)|\n$|$)/gm;
@@ -61,7 +64,7 @@ function processFootnotes(text) {
   while ((match = fnDefRegex.exec(text)) !== null) {
     var label = match[1];
     // Trim indented continuation lines and collapse to a single string
-    var body = match[3].replace(/\n {4}/g, '\n').trim();
+    var body = match[3].replace(new RegExp(`\n {${INDENT_SPACES}}`, 'g'), '\n').trim();
     footnoteMap[label] = body;
   }
   if (Object.keys(footnoteMap).length === 0) return text;
