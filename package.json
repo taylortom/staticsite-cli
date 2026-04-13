@@ -97,7 +97,7 @@
   "dependencies": {
     "chalk": "^5.4.0",
     "dayjs": "^1.11.0",
-    "finalhandler": "1.1.1",
+    "finalhandler": "2.1.1",
     "highlight.js": "^11.4.0",
     "less": "4.6.4",
     "marked": "^4.0.12",
