@@ -11,34 +11,27 @@ function imageReplace(s) {
 */
 export default function render(text) {
   // overrides for the Marked HTML renderer
-  marked.use({ 
+  marked.use({
     renderer: {
-      heading(value, level) {
-        var tag = `h${level}`;
-        return `<${tag}>${value}</${tag}>`;
+      code({ text }) {
+        return `<div class="source_code" style="white-space: pre-wrap;">${hl.highlightAuto(text).value}</div>`;
       },
-      code(value) {
-        return `<div class="source_code" style="white-space: pre-wrap;">${hl.highlightAuto(value).value}</div>`;
+      codespan({ text }) {
+        return `<span class="source_code inline">${text}</span>`;
       },
-      codespan(value) {
-        return `<span class="source_code inline">${value}</span>`;
+      image({ href, title, text }) {
+        return `<a href="${href}"><img class='media' title="${title || ''}" alt="${text || ''}" src="${imageReplace(href)}" /></a>`;
       },
-      blockquote(value) {
-        return `<div class="blockquote">${value}</div>`;
-      },
-      image(href, title, alt) {
-        return `<a href="${href}"><img class='media' title="${title}" alt="${alt}" src="${imageReplace(href)}" /></a>`;
-      },
-      html(value) { // TODO this is only block-level
-        if(!value) return;
-        var match = value.match(/<(.*?)\s/);
+      html({ text }) { // TODO this is only block-level
+        if(!text) return;
+        var match = text.match(/<(.*?)\s/);
         if(match) {
-          var name = value.match(/<(.*?)\s/)[1];
+          var name = text.match(/<(.*?)\s/)[1];
           if(name === "youtube") {
-            return `<div class='youtubeWrapper'><div class='inner'><iframe frameborder='0' allowfullscreen='' src='https://www.youtube.com/embed/${value.match(/video-id="(.*)"/)[1]}?rel=0&amp;showinfo=0' allowfullscreen></iframe></div></div>`;
+            return `<div class='youtubeWrapper'><div class='inner'><iframe frameborder='0' allowfullscreen='' src='https://www.youtube.com/embed/${text.match(/video-id="(.*)"/)[1]}?rel=0&amp;showinfo=0' allowfullscreen></iframe></div></div>`;
           }
         }
-        return value;
+        return text;
       }
     }
   });
