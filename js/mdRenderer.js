@@ -1,6 +1,7 @@
 import config from './config.js';
 import hl from 'highlight.js';
 import { marked } from 'marked';
+import markedFootnote from 'marked-footnote';
 import path from 'path';
 
 function imageReplace(s) {
@@ -11,6 +12,7 @@ function imageReplace(s) {
 */
 export default function render(text) {
   // overrides for the Marked HTML renderer
+  marked.use(markedFootnote());
   marked.use({
     renderer: {
       code({ text }) {
@@ -36,52 +38,5 @@ export default function render(text) {
     }
   });
   text = imageReplace(text);
-  text = processFootnotes(text);
-  var result = text.footnotes ? marked.parse(text.body) + text.footnotes : marked.parse(text);
-  return result;
+  return marked.parse(text);
 };
-
-/*
-* Extracts footnote definitions and references from markdown text.
-* Returns the modified text string if no footnotes are found, or an object
-* { body, footnotes } if footnotes are present.
-* Note: footnote text is authored content (not untrusted user input) so it is
-* not HTML-escaped, consistent with the rest of the markdown renderer pipeline.
-*/
-function processFootnotes(text) {
-  var INDENT_SPACES = 4; // standard markdown continuation indent
-  // Collect all footnote definitions: [^label]: text (with optional indented continuation)
-  var footnoteMap = {};
-  var fnDefRegex = /^\[\^([^\]]+)\]:([ \t]+)([\s\S]*?)(?=\n\[\^|\n\n(?!\s)|\n$|$)/gm;
-  var match;
-  while ((match = fnDefRegex.exec(text)) !== null) {
-    var label = match[1];
-    // Trim indented continuation lines and collapse to a single string
-    var body = match[3].replace(new RegExp(`\n {${INDENT_SPACES}}`, 'g'), '\n').trim();
-    footnoteMap[label] = body;
-  }
-  if (Object.keys(footnoteMap).length === 0) return text;
-
-  // Remove footnote definitions from text
-  text = text.replace(/^\[\^[^\]]+\]:[ \t]+[\s\S]*?(?=\n\[\^|\n\n(?!\s)|\n$|$)/gm, '');
-
-  // Replace inline footnote references with numbered superscript links
-  var footnoteOrder = [];
-  text = text.replace(/\[\^([^\]]+)\]/g, function(full, label) {
-    if (!footnoteOrder.includes(label)) footnoteOrder.push(label);
-    var num = footnoteOrder.indexOf(label) + 1;
-    return `<sup id="fnref${num}"><a href="#fn${num}">${num}</a></sup>`;
-  });
-
-  // Build the footnotes HTML block
-  var footnotesHtml = '<div class="footnotes"><ol>';
-  for (var i = 0; i < footnoteOrder.length; i++) {
-    var fnLabel = footnoteOrder[i];
-    var num = i + 1;
-    var fnText = footnoteMap[fnLabel] || '';
-    footnotesHtml += `<li id="fn${num}">${fnText} <a href="#fnref${num}">&#8617;</a></li>`;
-  }
-  footnotesHtml += '</ol></div>';
-
-  return { body: text, footnotes: footnotesHtml };
-}
