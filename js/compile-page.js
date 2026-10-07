@@ -13,7 +13,7 @@ var Page = function(id, data, args) {
 };
 
 Page.prototype.getModel = function(customAttributes) {
-  return { menu: config.menu, ...this, ...customAttributes };
+  return { menu: config.menu, sidebar: config.sidebar, ...this, ...customAttributes };
 };
 
 Page.prototype.loadTemplates = async function() {

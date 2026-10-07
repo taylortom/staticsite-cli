@@ -80,6 +80,25 @@ This object defines what's shown on the site's main navigation menu, and should 
 }
 ```
 
+#### sidebar
+
+Optional. Defines the site-wide sidebar content, made available to templates as `sidebar`:
+```
+"sidebar": {
+  "title": {
+    "wide": "", // title html shown on wide (desktop) layouts
+    "narrow": "" // title html shown on narrow (tablet/mobile) layouts
+  },
+  "status": {
+    "html": "", // what's rendered on-screen
+    "url": "", // where to navigate on click
+    "target": "" // the anchor tag's target
+  }
+}
+```
+
+Per-page sidebar navigation is defined using each page's `links` attribute (see [pages](#pages)).
+
 #### theme
 
 ```
